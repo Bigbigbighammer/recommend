@@ -139,41 +139,6 @@ Stage 4: 多样性重排 (内存计算, 无外部依赖)
   └── enrichWithMetadata: DB 查 title, genres, poster_url → HTTP JSON
 ```
 
-### 评分反馈闭环 (POST /api/ratings)
-
-用户每次评分后，同步更新 4 个存储，形成反馈闭环：
-
-```
-POST /api/ratings  {user_id, movie_id, rating}
-       │
-       ├── 1. PostgreSQL: INSERT/UPDATE ratings + UPDATE movies.avg_rating
-       ├── 2. ES: 同步评分到 movies 索引 (更新 avg_rating, rating_count)
-       ├── 3. Redis: LPUSH user:{id}:history  movie_id
-       ├── 4. Redis: HSET user:{id}:profile  重新计算 frequent_genres
-       └── 5. Redis: HINCRBY user:{id}:genre_ucb 更新 genre 探索/利用统计
-```
-
-这些更新对后续推荐请求立即生效：
-- Step 3 → 冷启动检测 (`histMovieIds.size()`) 实时反映最新评分
-- Step 4 → 召回阶段 `frequent_genres` 实时反映偏好变化
-- Step 5 → 冷启动 UCB 策略的探索/利用决策实时调整
-
-```java
-// RatingHandler 中:
-public Mono<ServerResponse> createRating(ServerRequest request) {
-    return request.bodyToMono(RatingCreate.class)
-        .flatMap(rating -> ratingService.saveRating(rating))           // 1. PG
-        .flatMap(rating -> esService.syncRating(rating))              // 2. ES
-        .flatMap(rating -> redisRepo.pushUserHistory(                 // 3. Redis history
-            rating.userId(), rating.movieId()))
-        .flatMap(rating -> updateFrequentGenres(rating.userId())      // 4. Redis profile
-            .thenReturn(rating))
-        .flatMap(rating -> redisRepo.updateUCBStats(                  // 5. Redis UCB
-            rating.userId(), getMovieGenre(rating.movieId()), rating.rating()))
-        .flatMap(rating -> ServerResponse.ok().bodyValue(rating));
-}
-```
-
 ### 召回 Snake Merge
 
 ```java
@@ -374,124 +339,7 @@ recommend:
 
 ---
 
-## 六、数据库 DDL
-
-```sql
--- 1. 用户表
-CREATE TABLE users (
-    user_id       SERIAL PRIMARY KEY,
-    email         VARCHAR(255) UNIQUE,
-    username      VARCHAR(100) UNIQUE,
-    hashed_password VARCHAR(255),
-    is_active     SMALLINT DEFAULT 1,
-    is_superuser  SMALLINT DEFAULT 0,
-    gender        CHAR(1),
-    age           VARCHAR(20),
-    occupation    VARCHAR(100),
-    zip_code      VARCHAR(10),
-    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    preferred_genres TEXT[]     -- PostgreSQL ARRAY
-);
-
--- 2. 电影表
-CREATE TABLE movies (
-    movie_id        SERIAL PRIMARY KEY,
-    imdb_id         VARCHAR(20) UNIQUE,
-    title           VARCHAR(255),
-    year            INTEGER,
-    genres          TEXT[],
-    description     TEXT,
-    avg_rating      FLOAT,
-    rating_count    INTEGER DEFAULT 0,
-    imdb_rating     FLOAT,
-    imdb_votes      INTEGER,
-    title_type      VARCHAR(50),
-    runtime_minutes INTEGER,
-    is_adult        SMALLINT DEFAULT 0,
-    created_by      INTEGER REFERENCES users(user_id)
-);
-
-CREATE INDEX idx_movies_title ON movies(title);
-CREATE INDEX idx_movies_year ON movies(year);
-CREATE INDEX idx_movies_avg_rating ON movies(avg_rating);
-CREATE INDEX idx_movies_imdb_rating ON movies(imdb_rating);
-
--- 3. 评分表
-CREATE TABLE ratings (
-    user_id   INTEGER REFERENCES users(user_id),
-    movie_id  INTEGER REFERENCES movies(movie_id),
-    rating    INTEGER CHECK (rating >= 1 AND rating <= 10),
-    timestamp BIGINT,
-    PRIMARY KEY (user_id, movie_id)
-);
-
--- 4. 类型字典表
-CREATE TABLE genres (
-    id   SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE
-);
-
--- 5. IMDb 标题评分表
-CREATE TABLE title_ratings (
-    tconst         VARCHAR(20) PRIMARY KEY,
-    average_rating FLOAT,
-    num_votes      INTEGER
-);
-
-CREATE INDEX idx_title_ratings_avg ON title_ratings(average_rating);
-CREATE INDEX idx_title_ratings_votes ON title_ratings(num_votes);
-
--- 6. IMDb 人物表
-CREATE TABLE name_basics (
-    nconst             VARCHAR(20) PRIMARY KEY,
-    primary_name       VARCHAR(255),
-    birth_year         INTEGER,
-    death_year         INTEGER,
-    primary_profession TEXT[],
-    known_for_titles   TEXT[]
-);
-
-CREATE INDEX idx_name_basics_name ON name_basics(primary_name);
-
--- 7. IMDb 剧组表
-CREATE TABLE title_crew (
-    tconst    VARCHAR(20) PRIMARY KEY,
-    directors TEXT[],
-    writers   TEXT[]
-);
-
--- 8. IMDb 主演/主创表
-CREATE TABLE title_principals (
-    tconst     VARCHAR(20),
-    ordering   INTEGER,
-    nconst     VARCHAR(20),
-    category   VARCHAR(50),
-    job        VARCHAR(255),
-    characters TEXT,
-    PRIMARY KEY (tconst, ordering)
-);
-
-CREATE INDEX idx_title_principals_nconst ON title_principals(nconst);
-
--- 9. IMDb 别名表
-CREATE TABLE title_akas (
-    tconst          VARCHAR(20),
-    ordering        INTEGER,
-    title           VARCHAR(500),
-    region          VARCHAR(10),
-    language        VARCHAR(10),
-    types           VARCHAR(100),
-    attributes      VARCHAR(255),
-    is_original_title SMALLINT,
-    PRIMARY KEY (tconst, ordering)
-);
-
-CREATE INDEX idx_title_akas_title ON title_akas(title);
-```
-
----
-
-## 七、数据访问层
+## 六、数据访问层
 
 ### MyBatis-Plus Mapper
 
@@ -537,28 +385,10 @@ public class MovieEntity {
 ```java
 @Component
 public class UserProfileRedisRepository {
-
-    // ===== 读取 =====
-
     Mono<Map<String, String>> getUserProfile(Long userId);
-    // HGETALL user:{id}:profile → Hash(gender, age, occupation, zip_code, frequent_genres)
-
     Mono<List<Long>> getUserHistory(Long userId, int maxLen);
-    // LRANGE user:{id}:history 0 maxLen → List[movie_id]
-
     Mono<Map<String, UCBStat>> getUCBStats(Long userId);
-    // HGETALL user:{id}:genre_ucb → 每种 genre 的 {n, reward}
-
-    // ===== 写入 (评分反馈闭环) =====
-
-    Mono<Void> pushUserHistory(Long userId, Long movieId);
-    // LPUSH user:{id}:history movieId
-
-    Mono<Void> updateUserProfile(Long userId, Map<String, String> profile);
-    // HSET user:{id}:profile {gender, age, occupation, zip_code, frequent_genres...}
-
     Mono<Void> updateUCBStats(Long userId, String genre, int reward);
-    // HINCRBY user:{id}:genre_ucb {genre}.n 1 + HINCRBY {genre}.reward
 }
 ```
 
@@ -575,7 +405,7 @@ public class MovieSearchRepository {
 
 ---
 
-## 八、异常处理与降级
+## 七、异常处理与降级
 
 ### 异常体系
 
@@ -622,7 +452,7 @@ rpcClient.predictCTR().timeout(Duration.ofMillis(200));
 
 ---
 
-## 九、性能优化
+## 八、性能优化
 
 ### 连接池配置
 
@@ -660,7 +490,7 @@ MyBatis-Plus 阻塞 I/O 操作自动在虚拟线程执行，不阻塞 EventLoop�
 
 ---
 
-## 十、API 端点清单 (20 个)
+## 九、API 端点清单 (20 个)
 
 | 方法 | 路径 | Handler | 说明 |
 |------|------|---------|------|
@@ -688,7 +518,7 @@ MyBatis-Plus 阻塞 I/O 操作自动在虚拟线程执行，不阻塞 EventLoop�
 
 ---
 
-## 十一、项目规模估算
+## 十、项目规模估算
 
 | 模块 | 文件数 (估) | 说明 |
 |------|-----------|------|
@@ -702,7 +532,7 @@ MyBatis-Plus 阻塞 I/O 操作自动在虚拟线程执行，不阻塞 EventLoop�
 
 ---
 
-## 十二、与 Python 推理服务的接口约定
+## 十一、与 Python 推理服务的接口约定
 
 ### 排序 (DeepFM CTR)
 
@@ -762,7 +592,7 @@ Response:
 
 ---
 
-## 十三、不纳入本次设计的内容
+## 十二、不纳入本次设计的内容
 
 - 离线训练管线的 Java 重写 (保留 Python)
 - gRPC 的 Proto 定义与实现 (预留接口, 后续补充)

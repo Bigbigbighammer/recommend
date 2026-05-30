@@ -15,4 +15,4 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=builder /build/recommend-api/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dmybatis-plus.network-check=false", "-jar", "app.jar"]

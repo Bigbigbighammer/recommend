@@ -38,9 +38,9 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q green || grep -q yellow"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health || exit 1"]
       interval: 10s
-      retries: 10
+      retries: 15
 
   python-inference:
     build:
@@ -49,7 +49,7 @@ services:
     ports:
       - "8081:8081"
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:8081/api/health | grep -q healthy"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; import json; r=urllib.request.urlopen('http://localhost:8081/api/health'); d=json.loads(r.read()); assert d['status']=='healthy'\" "]
       interval: 10s
       retries: 5
 
@@ -58,13 +58,13 @@ services:
       context: .
       dockerfile: Dockerfile.java
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/rec_db
       SPRING_DATASOURCE_USERNAME: rec
       SPRING_DATASOURCE_PASSWORD: rec123
       SPRING_DATA_REDIS_HOST: redis
-      SPRING_DATA_ELASTICSEARCH_CLIENT_REACTIVE_ENDPOINTS: elasticsearch:9200
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
       RECOMMEND_RPC_INFERENCE_BASE_URL: http://python-inference:8081
     depends_on:
       postgres:
@@ -81,7 +81,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
     ports:
-      - "80:80"
+      - "8088:80"
     depends_on:
       - java
 

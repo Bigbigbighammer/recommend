@@ -1,6 +1,5 @@
 package com.rec.repository.es;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.query.Criteria;
@@ -20,17 +19,15 @@ public class MovieSearchRepository {
     }
 
     public Flux<MovieSearchResult> searchByGenres(List<String> genres, int topK) {
+        CriteriaQuery query;
         if (genres == null || genres.isEmpty()) {
-            // Return popular movies if no genre filter
             Criteria criteria = new Criteria("avg_rating").greaterThanEqual(5);
-            CriteriaQuery query = new CriteriaQuery(criteria);
-            query.setMaxResults(topK);
-            return es.search(query, MovieSearchResult.class)
-                .map(SearchHit::getContent);
+            query = new CriteriaQuery(criteria);
+        } else {
+            Criteria criteria = new Criteria("genres").in(genres)
+                .and(new Criteria("avg_rating").greaterThanEqual(5));
+            query = new CriteriaQuery(criteria);
         }
-        Criteria criteria = new Criteria("genres").in(genres)
-            .and(new Criteria("avg_rating").greaterThanEqual(5));
-        CriteriaQuery query = new CriteriaQuery(criteria);
         query.setMaxResults(topK);
         return es.search(query, MovieSearchResult.class)
             .map(SearchHit::getContent);
@@ -40,7 +37,7 @@ public class MovieSearchRepository {
         Criteria criteria = new Criteria("title").matches(keyword)
             .or(new Criteria("description").matches(keyword));
         CriteriaQuery query = new CriteriaQuery(criteria);
-        query.setPageable(PageRequest.of(from / size, size));
+        query.setMaxResults(size);
         return es.search(query, MovieSearchResult.class)
             .map(SearchHit::getContent);
     }
