@@ -12,7 +12,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.funrec</groupId>
+    <groupId>com.rec</groupId>
     <artifactId>recommend-service</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -38,27 +38,27 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-repository</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-rpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-strategy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-pipeline</artifactId>
                 <version>${project.version}</version>
             </dependency>

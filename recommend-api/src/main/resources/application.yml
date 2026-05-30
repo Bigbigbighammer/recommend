@@ -3,15 +3,15 @@ server:
 
 spring:
   application:
-    name: funrec-recommend-service
+    name: rec-recommend-service
   threads:
     virtual:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/funrec_db
-    username: funrec
-    password: funrec123
+    url: jdbc:postgresql://localhost:5432/rec_db
+    username: rec
+    password: rec123
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20

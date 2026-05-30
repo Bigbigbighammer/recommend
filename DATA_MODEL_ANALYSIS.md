@@ -202,7 +202,7 @@ offline/    → 离线训练管线（特征工程 → 训练 → 部署）
 | app_name | "FunRec" | 应用名 |
 | app_version | "1.0.0" | 版本号 |
 | debug | False | 调试模式 |
-| database_url | postgresql://funrec:funrec123@localhost:5432/funrec_db | PG 连接串 |
+| database_url | postgresql://rec:rec123@localhost:5432/rec_db | PG 连接串 |
 | redis_url | redis://localhost:6379/0 | Redis 连接串 |
 | redis_ttl | 600 | Redis 缓存 TTL (秒) |
 | elasticsearch_url | http://localhost:9200 | ES 连接串 |

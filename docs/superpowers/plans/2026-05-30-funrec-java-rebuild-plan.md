@@ -17,7 +17,7 @@ recommend-service/
 ├── pom.xml                                    # 父 POM, 声明 6 个子模块
 ├── recommend-common/
 │   ├── pom.xml
-│   └── src/main/java/com/funrec/common/
+│   └── src/main/java/com/rec/common/
 │       ├── model/
 │       │   ├── request/                       # 6 个请求 DTO (Record)
 │       │   │   ├── LoginRequest.java
@@ -62,7 +62,7 @@ recommend-service/
 │
 ├── recommend-repository/
 │   ├── pom.xml
-│   └── src/main/java/com/funrec/repository/
+│   └── src/main/java/com/rec/repository/
 │       ├── entity/
 │       │   ├── UserEntity.java
 │       │   ├── MovieEntity.java
@@ -92,13 +92,13 @@ recommend-service/
 │
 ├── recommend-rpc/
 │   ├── pom.xml
-│   └── src/main/java/com/funrec/rpc/
+│   └── src/main/java/com/rec/rpc/
 │       ├── ModelInferenceClient.java
 │       └── HttpModelInferenceClient.java
 │
 ├── recommend-strategy/
 │   ├── pom.xml
-│   └── src/main/java/com/funrec/strategy/
+│   └── src/main/java/com/rec/strategy/
 │       ├── recall/
 │       │   ├── RecallStrategy.java
 │       │   ├── UserPreferenceRecallStrategy.java
@@ -125,7 +125,7 @@ recommend-service/
 │
 ├── recommend-pipeline/
 │   ├── pom.xml
-│   └── src/main/java/com/funrec/pipeline/
+│   └── src/main/java/com/rec/pipeline/
 │       ├── PipelineContext.java
 │       ├── RecommendationPipeline.java
 │       ├── UserFeatureEnrichmentStage.java
@@ -138,7 +138,7 @@ recommend-service/
 │
 └── recommend-api/
     ├── pom.xml
-    └── src/main/java/com/funrec/api/
+    └── src/main/java/com/rec/api/
         ├── handler/
         │   ├── AuthHandler.java
         │   ├── UserHandler.java
@@ -187,7 +187,7 @@ recommend-service/
         <relativePath/>
     </parent>
 
-    <groupId>com.funrec</groupId>
+    <groupId>com.rec</groupId>
     <artifactId>recommend-service</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -210,27 +210,27 @@ recommend-service/
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-repository</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-rpc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-strategy</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.funrec</groupId>
+                <groupId>com.rec</groupId>
                 <artifactId>recommend-pipeline</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -254,7 +254,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -283,7 +283,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -291,7 +291,7 @@ recommend-service/
 
     <dependencies>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-common</artifactId>
         </dependency>
         <dependency>
@@ -325,7 +325,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -333,7 +333,7 @@ recommend-service/
 
     <dependencies>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-common</artifactId>
         </dependency>
         <dependency>
@@ -354,7 +354,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -362,15 +362,15 @@ recommend-service/
 
     <dependencies>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-repository</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-rpc</artifactId>
         </dependency>
         <dependency>
@@ -391,7 +391,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -399,11 +399,11 @@ recommend-service/
 
     <dependencies>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-strategy</artifactId>
         </dependency>
         <dependency>
@@ -424,7 +424,7 @@ recommend-service/
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.funrec</groupId>
+        <groupId>com.rec</groupId>
         <artifactId>recommend-service</artifactId>
         <version>1.0.0</version>
     </parent>
@@ -432,11 +432,11 @@ recommend-service/
 
     <dependencies>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-pipeline</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.funrec</groupId>
+            <groupId>com.rec</groupId>
             <artifactId>recommend-repository</artifactId>
         </dependency>
         <dependency>
@@ -480,17 +480,17 @@ git commit -m "feat: add Maven multi-module project scaffold"
 ### Task 2: Common — 请求 DTO (Record)
 
 **Files:**
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/LoginRequest.java`
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/SignupRequest.java`
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/UserUpdateRequest.java`
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/MovieCreateRequest.java`
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/RatingCreateRequest.java`
-- Create: `recommend-common/src/main/java/com/funrec/common/model/request/UserFeaturesRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/LoginRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/SignupRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/UserUpdateRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/MovieCreateRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/RatingCreateRequest.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/request/UserFeaturesRequest.java`
 
 - [ ] **Step 1: 创建 LoginRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -504,7 +504,7 @@ public record LoginRequest(
 - [ ] **Step 2: 创建 SignupRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -525,7 +525,7 @@ public record SignupRequest(
 - [ ] **Step 3: 创建 UserUpdateRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import java.util.List;
 
@@ -541,7 +541,7 @@ public record UserUpdateRequest(
 - [ ] **Step 4: 创建 MovieCreateRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -563,7 +563,7 @@ public record MovieCreateRequest(
 - [ ] **Step 5: 创建 RatingCreateRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -578,7 +578,7 @@ public record RatingCreateRequest(
 - [ ] **Step 6: 创建 UserFeaturesRequest**
 
 ```java
-package com.funrec.common.model.request;
+package com.rec.common.model.request;
 
 import java.util.List;
 
@@ -613,12 +613,12 @@ git commit -m "feat: add request DTOs to common module"
 ### Task 3: Common — 响应 DTO (Record)
 
 **Files:**
-- Create: `recommend-common/src/main/java/com/funrec/common/model/response/` 下 14 个文件
+- Create: `recommend-common/src/main/java/com/rec/common/model/response/` 下 14 个文件
 
 - [ ] **Step 1: 创建 TokenResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -635,7 +635,7 @@ public record TokenResponse(
 - [ ] **Step 2: 创建 UserProfileResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -659,7 +659,7 @@ public record UserProfileResponse(
 - [ ] **Step 3: 创建 MovieDetailResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.util.List;
 
@@ -682,7 +682,7 @@ public record MovieDetailResponse(
 - [ ] **Step 4: 创建 MovieListItem + MovieListResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.util.List;
 
@@ -707,7 +707,7 @@ public record MovieListResponse(
 - [ ] **Step 5: 创建 RatingResponse + UserRatingResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 public record RatingResponse(
     Long userId,
@@ -725,7 +725,7 @@ public record UserRatingResponse(
 - [ ] **Step 6: 创建推荐响应 DTO**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.util.List;
 
@@ -749,7 +749,7 @@ public record RecommendationResponse(
 - [ ] **Step 7: 创建人物相关 DTO**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.util.List;
 
@@ -780,7 +780,7 @@ public record MovieCastResponse(
 - [ ] **Step 8: 创建 GenreListResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 import java.util.List;
 
@@ -790,7 +790,7 @@ public record GenreListResponse(List<String> genres) {}
 - [ ] **Step 9: 创建 HealthResponse**
 
 ```java
-package com.funrec.common.model.response;
+package com.rec.common.model.response;
 
 public record HealthResponse(
     String status,
@@ -814,14 +814,14 @@ git commit -m "feat: add response DTOs to common module"
 ### Task 4: Common — Pipeline 内部模型 + 异常 + 配置
 
 **Files:**
-- Create: `recommend-common/src/main/java/com/funrec/common/model/pipeline/` 下 9 个 Record
-- Create: `recommend-common/src/main/java/com/funrec/common/exception/` 下 5 个 Exception 类
-- Create: `recommend-common/src/main/java/com/funrec/common/config/RecommendProperties.java`
+- Create: `recommend-common/src/main/java/com/rec/common/model/pipeline/` 下 9 个 Record
+- Create: `recommend-common/src/main/java/com/rec/common/exception/` 下 5 个 Exception 类
+- Create: `recommend-common/src/main/java/com/rec/common/config/RecommendProperties.java`
 
 - [ ] **Step 1: 创建管线 Record 模型**
 
 ```java
-package com.funrec.common.model.pipeline;
+package com.rec.common.model.pipeline;
 
 import java.util.List;
 
@@ -862,7 +862,7 @@ public record ModelVersion(String modelType, String version, String deployTime) 
 - [ ] **Step 2: 创建异常类**
 
 ```java
-package com.funrec.common.exception;
+package com.rec.common.exception;
 
 public class RecommendationException extends RuntimeException {
     public RecommendationException(String message) { super(message); }
@@ -889,7 +889,7 @@ public class AuthException extends RuntimeException {
 - [ ] **Step 3: 创建 RecommendProperties**
 
 ```java
-package com.funrec.common.config;
+package com.rec.common.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Map;
@@ -925,13 +925,13 @@ git commit -m "feat: add pipeline models, exceptions, and config properties"
 ### Task 5: Repository — 9 个 JPA Entity
 
 **Files:**
-- Create: `recommend-repository/src/main/java/com/funrec/repository/entity/` 下 9 个 Entity
-- Create: `recommend-repository/src/main/java/com/funrec/repository/config/ArrayTypeHandler.java`
+- Create: `recommend-repository/src/main/java/com/rec/repository/entity/` 下 9 个 Entity
+- Create: `recommend-repository/src/main/java/com/rec/repository/config/ArrayTypeHandler.java`
 
 - [ ] **Step 1: 创建 ArrayTypeHandler**
 
 ```java
-package com.funrec.repository.config;
+package com.rec.repository.config;
 
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
@@ -970,10 +970,10 @@ public class ArrayTypeHandler extends BaseTypeHandler<String[]> {
 - [ ] **Step 2: 创建核心 Entity (User, Movie, Rating)**
 
 ```java
-package com.funrec.repository.entity;
+package com.rec.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.funrec.repository.config.ArrayTypeHandler;
+import com.rec.repository.config.ArrayTypeHandler;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -1033,10 +1033,10 @@ public class RatingEntity {
 - [ ] **Step 3: 创建 Genre + IMDb Entity (6 个)**
 
 ```java
-package com.funrec.repository.entity;
+package com.rec.repository.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.funrec.repository.config.ArrayTypeHandler;
+import com.rec.repository.config.ArrayTypeHandler;
 import lombok.Data;
 
 @Data
@@ -1120,15 +1120,15 @@ git commit -m "feat: add JPA entities with PG ARRAY type handler"
 ### Task 6: Repository — 9 个 MyBatis-Plus Mapper
 
 **Files:**
-- Create: `recommend-repository/src/main/java/com/funrec/repository/mapper/` 下 9 个 Mapper 接口
+- Create: `recommend-repository/src/main/java/com/rec/repository/mapper/` 下 9 个 Mapper 接口
 
 - [ ] **Step 1: 创建 UserMapper**
 
 ```java
-package com.funrec.repository.mapper;
+package com.rec.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.funrec.repository.entity.UserEntity;
+import com.rec.repository.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -1147,11 +1147,11 @@ public interface UserMapper extends BaseMapper<UserEntity> {
 - [ ] **Step 2: 创建 MovieMapper**
 
 ```java
-package com.funrec.repository.mapper;
+package com.rec.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.funrec.repository.entity.MovieEntity;
+import com.rec.repository.entity.MovieEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -1185,10 +1185,10 @@ public interface MovieMapper extends BaseMapper<MovieEntity> {
 - [ ] **Step 3: 创建 RatingMapper**
 
 ```java
-package com.funrec.repository.mapper;
+package com.rec.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.funrec.repository.entity.RatingEntity;
+import com.rec.repository.entity.RatingEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -1213,10 +1213,10 @@ public interface RatingMapper extends BaseMapper<RatingEntity> {
 - [ ] **Step 4: 创建其余 6 个 Mapper**
 
 ```java
-package com.funrec.repository.mapper;
+package com.rec.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.funrec.repository.entity.*;
+import com.rec.repository.entity.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -1266,13 +1266,13 @@ git commit -m "feat: add MyBatis-Plus mapper interfaces"
 ### Task 7: Repository — Redis + ES Repository
 
 **Files:**
-- Create: `recommend-repository/src/main/java/com/funrec/repository/redis/UserProfileRedisRepository.java`
-- Create: `recommend-repository/src/main/java/com/funrec/repository/es/MovieSearchRepository.java`
+- Create: `recommend-repository/src/main/java/com/rec/repository/redis/UserProfileRedisRepository.java`
+- Create: `recommend-repository/src/main/java/com/rec/repository/es/MovieSearchRepository.java`
 
 - [ ] **Step 1: 创建 UserProfileRedisRepository**
 
 ```java
-package com.funrec.repository.redis;
+package com.rec.repository.redis;
 
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -1341,7 +1341,7 @@ public class UserProfileRedisRepository {
 - [ ] **Step 2: 创建 MovieSearchRepository**
 
 ```java
-package com.funrec.repository.es;
+package com.rec.repository.es;
 
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchClient;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
@@ -1395,7 +1395,7 @@ public class MovieSearchRepository {
 - [ ] **Step 3: 创建 MovieSearchResult DTO (放在 repository 模块)**
 
 ```java
-package com.funrec.repository.es;
+package com.rec.repository.es;
 
 import org.springframework.data.elasticsearch.annotations.Document;
 
@@ -1428,15 +1428,15 @@ git commit -m "feat: add Redis and Elasticsearch repositories"
 ### Task 8: RPC — ModelInferenceClient 接口 + HTTP 实现
 
 **Files:**
-- Create: `recommend-rpc/src/main/java/com/funrec/rpc/ModelInferenceClient.java`
-- Create: `recommend-rpc/src/main/java/com/funrec/rpc/HttpModelInferenceClient.java`
+- Create: `recommend-rpc/src/main/java/com/rec/rpc/ModelInferenceClient.java`
+- Create: `recommend-rpc/src/main/java/com/rec/rpc/HttpModelInferenceClient.java`
 
 - [ ] **Step 1: 创建接口**
 
 ```java
-package com.funrec.rpc;
+package com.rec.rpc;
 
-import com.funrec.common.model.pipeline.*;
+import com.rec.common.model.pipeline.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -1456,10 +1456,10 @@ public interface ModelInferenceClient {
 - [ ] **Step 2: 创建 HTTP 实现**
 
 ```java
-package com.funrec.rpc;
+package com.rec.rpc;
 
-import com.funrec.common.exception.InferenceException;
-import com.funrec.common.model.pipeline.*;
+import com.rec.common.exception.InferenceException;
+import com.rec.common.model.pipeline.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.ParameterizedTypeReference;
@@ -1546,17 +1546,17 @@ git commit -m "feat: add RPC client interface and HTTP implementation"
 ### Task 9: Strategy — 召回接口 + 3 个实现
 
 **Files:**
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/recall/RecallStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/recall/UserPreferenceRecallStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/recall/YouTubeDNNRecallStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/recall/ItemEmbeddingRecallStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/recall/RecallStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/recall/UserPreferenceRecallStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/recall/YouTubeDNNRecallStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/recall/ItemEmbeddingRecallStrategy.java`
 
 - [ ] **Step 1: 创建 RecallStrategy 接口**
 
 ```java
-package com.funrec.strategy.recall;
+package com.rec.strategy.recall;
 
-import com.funrec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.RecallItem;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -1571,10 +1571,10 @@ public interface RecallStrategy {
 - [ ] **Step 2: 创建 UserPreferenceRecallStrategy**
 
 ```java
-package com.funrec.strategy.recall;
+package com.rec.strategy.recall;
 
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.repository.es.MovieSearchRepository;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.repository.es.MovieSearchRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1615,11 +1615,11 @@ public class UserPreferenceRecallStrategy implements RecallStrategy {
 - [ ] **Step 3: 创建 YouTubeDNNRecallStrategy**
 
 ```java
-package com.funrec.strategy.recall;
+package com.rec.strategy.recall;
 
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.common.model.pipeline.RecallRequest;
-import com.funrec.rpc.ModelInferenceClient;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.RecallRequest;
+import com.rec.rpc.ModelInferenceClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1667,11 +1667,11 @@ public class YouTubeDNNRecallStrategy implements RecallStrategy {
 - [ ] **Step 4: 创建 ItemEmbeddingRecallStrategy**
 
 ```java
-package com.funrec.strategy.recall;
+package com.rec.strategy.recall;
 
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.common.model.pipeline.RecallRequest;
-import com.funrec.rpc.ModelInferenceClient;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.RecallRequest;
+import com.rec.rpc.ModelInferenceClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1725,18 +1725,18 @@ git commit -m "feat: add recall strategy interface and 3 implementations"
 ### Task 10: Strategy — 排序接口 + 2 个实现
 
 **Files:**
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/ranking/RankingStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/ranking/DeepFMRankingStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/ranking/FallbackRankingStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/ranking/RankingStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/ranking/DeepFMRankingStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/ranking/FallbackRankingStrategy.java`
 
 - [ ] **Step 1: 创建 RankingStrategy 接口**
 
 ```java
-package com.funrec.strategy.ranking;
+package com.rec.strategy.ranking;
 
-import com.funrec.common.model.pipeline.RankedItem;
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.common.model.pipeline.ItemFeatures;
+import com.rec.common.model.pipeline.RankedItem;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.ItemFeatures;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -1753,10 +1753,10 @@ public interface RankingStrategy {
 - [ ] **Step 2: 创建 DeepFMRankingStrategy**
 
 ```java
-package com.funrec.strategy.ranking;
+package com.rec.strategy.ranking;
 
-import com.funrec.common.model.pipeline.*;
-import com.funrec.rpc.ModelInferenceClient;
+import com.rec.common.model.pipeline.*;
+import com.rec.rpc.ModelInferenceClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1822,9 +1822,9 @@ public class DeepFMRankingStrategy implements RankingStrategy {
 - [ ] **Step 3: 创建 FallbackRankingStrategy**
 
 ```java
-package com.funrec.strategy.ranking;
+package com.rec.strategy.ranking;
 
-import com.funrec.common.model.pipeline.*;
+import com.rec.common.model.pipeline.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1876,20 +1876,20 @@ git commit -m "feat: add ranking strategy interface and DeepFM + Fallback implem
 ### Task 11: Strategy — 重排接口 + 冷启动接口及 5 个实现
 
 **Files:**
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/reranking/RerankingStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/reranking/GenreDispersionStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/reranking/DecadeDispersionStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/coldstart/ColdStartStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/coldstart/UCBGenreStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/coldstart/PreferredGenreStrategy.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/coldstart/PopularRecentStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/reranking/RerankingStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/reranking/GenreDispersionStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/reranking/DecadeDispersionStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/coldstart/ColdStartStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/coldstart/UCBGenreStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/coldstart/PreferredGenreStrategy.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/coldstart/PopularRecentStrategy.java`
 
 - [ ] **Step 1: 创建 RerankingStrategy 接口**
 
 ```java
-package com.funrec.strategy.reranking;
+package com.rec.strategy.reranking;
 
-import com.funrec.common.model.pipeline.RankedItem;
+import com.rec.common.model.pipeline.RankedItem;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -1904,9 +1904,9 @@ public interface RerankingStrategy {
 - [ ] **Step 2: 创建 GenreDispersionStrategy**
 
 ```java
-package com.funrec.strategy.reranking;
+package com.rec.strategy.reranking;
 
-import com.funrec.common.model.pipeline.RankedItem;
+import com.rec.common.model.pipeline.RankedItem;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -1955,9 +1955,9 @@ public class GenreDispersionStrategy implements RerankingStrategy {
 - [ ] **Step 3: 创建 DecadeDispersionStrategy**
 
 ```java
-package com.funrec.strategy.reranking;
+package com.rec.strategy.reranking;
 
-import com.funrec.common.model.pipeline.RankedItem;
+import com.rec.common.model.pipeline.RankedItem;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -2006,9 +2006,9 @@ public class DecadeDispersionStrategy implements RerankingStrategy {
 - [ ] **Step 4: 创建 ColdStartStrategy 接口**
 
 ```java
-package com.funrec.strategy.coldstart;
+package com.rec.strategy.coldstart;
 
-import com.funrec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.RecallItem;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -2025,11 +2025,11 @@ public interface ColdStartStrategy {
 - [ ] **Step 5: 创建 3 个冷启动实现**
 
 ```java
-package com.funrec.strategy.coldstart;
+package com.rec.strategy.coldstart;
 
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.repository.es.MovieSearchRepository;
-import com.funrec.repository.redis.UserProfileRedisRepository;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.repository.es.MovieSearchRepository;
+import com.rec.repository.redis.UserProfileRedisRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -2151,17 +2151,17 @@ git commit -m "feat: add reranking and coldstart strategy interfaces and impleme
 ### Task 12: Strategy — 4 个 Registry 收集器
 
 **Files:**
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/registry/RecallStrategyRegistry.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/registry/RankingStrategyRegistry.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/registry/RerankingStrategyRegistry.java`
-- Create: `recommend-strategy/src/main/java/com/funrec/strategy/registry/ColdStartStrategyRegistry.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/registry/RecallStrategyRegistry.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/registry/RankingStrategyRegistry.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/registry/RerankingStrategyRegistry.java`
+- Create: `recommend-strategy/src/main/java/com/rec/strategy/registry/ColdStartStrategyRegistry.java`
 
 - [ ] **Step 1: 创建 RecallStrategyRegistry**
 
 ```java
-package com.funrec.strategy.registry;
+package com.rec.strategy.registry;
 
-import com.funrec.strategy.recall.RecallStrategy;
+import com.rec.strategy.recall.RecallStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -2183,11 +2183,11 @@ public class RecallStrategyRegistry {
 - [ ] **Step 2: 创建其余 3 个 Registry**
 
 ```java
-package com.funrec.strategy.registry;
+package com.rec.strategy.registry;
 
-import com.funrec.strategy.ranking.RankingStrategy;
-import com.funrec.strategy.reranking.RerankingStrategy;
-import com.funrec.strategy.coldstart.ColdStartStrategy;
+import com.rec.strategy.ranking.RankingStrategy;
+import com.rec.strategy.reranking.RerankingStrategy;
+import com.rec.strategy.coldstart.ColdStartStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -2245,15 +2245,15 @@ git commit -m "feat: add strategy registry collectors"
 ### Task 13: Pipeline — Context + SnakeMerge
 
 **Files:**
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/PipelineContext.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/SnakeMergeUtil.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/PipelineContext.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/SnakeMergeUtil.java`
 
 - [ ] **Step 1: 创建 PipelineContext**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.common.model.pipeline.*;
+import com.rec.common.model.pipeline.*;
 
 import java.util.*;
 
@@ -2315,9 +2315,9 @@ public record PipelineContext(
 - [ ] **Step 2: 创建 SnakeMergeUtil**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.common.model.pipeline.RecallItem;
+import com.rec.common.model.pipeline.RecallItem;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -2391,21 +2391,21 @@ git commit -m "feat: add PipelineContext and SnakeMergeUtil"
 ### Task 14: Pipeline — 6 个 Stage + 主 Pipeline
 
 **Files:**
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/UserFeatureEnrichmentStage.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/ColdStartDetectionStage.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/ColdStartPipeline.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/RecallStage.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/RankingStage.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/RerankingStage.java`
-- Create: `recommend-pipeline/src/main/java/com/funrec/pipeline/RecommendationPipeline.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/UserFeatureEnrichmentStage.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/ColdStartDetectionStage.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/ColdStartPipeline.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/RecallStage.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/RankingStage.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/RerankingStage.java`
+- Create: `recommend-pipeline/src/main/java/com/rec/pipeline/RecommendationPipeline.java`
 
 - [ ] **Step 1: 创建 UserFeatureEnrichmentStage**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.repository.mapper.UserMapper;
-import com.funrec.repository.redis.UserProfileRedisRepository;
+import com.rec.repository.mapper.UserMapper;
+import com.rec.repository.redis.UserProfileRedisRepository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -2466,7 +2466,7 @@ public class UserFeatureEnrichmentStage {
 - [ ] **Step 2: 创建 ColdStartDetectionStage**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -2486,11 +2486,11 @@ public class ColdStartDetectionStage {
 - [ ] **Step 3: 创建 ColdStartPipeline**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.common.model.pipeline.RecallItem;
-import com.funrec.strategy.coldstart.ColdStartStrategy;
-import com.funrec.strategy.registry.ColdStartStrategyRegistry;
+import com.rec.common.model.pipeline.RecallItem;
+import com.rec.strategy.coldstart.ColdStartStrategy;
+import com.rec.strategy.registry.ColdStartStrategyRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -2531,10 +2531,10 @@ public class ColdStartPipeline {
 - [ ] **Step 4: 创建 RecallStage**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.strategy.recall.RecallStrategy;
-import com.funrec.strategy.registry.RecallStrategyRegistry;
+import com.rec.strategy.recall.RecallStrategy;
+import com.rec.strategy.registry.RecallStrategyRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -2564,13 +2564,13 @@ public class RecallStage {
 - [ ] **Step 5: 创建 RankingStage**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.common.model.pipeline.*;
-import com.funrec.repository.mapper.MovieMapper;
-import com.funrec.repository.entity.MovieEntity;
-import com.funrec.strategy.ranking.RankingStrategy;
-import com.funrec.strategy.registry.RankingStrategyRegistry;
+import com.rec.common.model.pipeline.*;
+import com.rec.repository.mapper.MovieMapper;
+import com.rec.repository.entity.MovieEntity;
+import com.rec.strategy.ranking.RankingStrategy;
+import com.rec.strategy.registry.RankingStrategyRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -2643,11 +2643,11 @@ public class RankingStage {
 - [ ] **Step 6: 创建 RerankingStage**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
-import com.funrec.common.model.pipeline.*;
-import com.funrec.strategy.reranking.RerankingStrategy;
-import com.funrec.strategy.registry.RerankingStrategyRegistry;
+import com.rec.common.model.pipeline.*;
+import com.rec.strategy.reranking.RerankingStrategy;
+import com.rec.strategy.registry.RerankingStrategyRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -2687,7 +2687,7 @@ public class RerankingStage {
 - [ ] **Step 7: 创建主 Pipeline**
 
 ```java
-package com.funrec.pipeline;
+package com.rec.pipeline;
 
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -2769,18 +2769,18 @@ git commit -m "feat: add pipeline stages and main orchestrator"
 ### Task 15: API — Auth + User Handler
 
 **Files:**
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/AuthHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/UserHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/AuthHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/UserHandler.java`
 
 - [ ] **Step 1: 创建 AuthHandler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.request.*;
-import com.funrec.common.model.response.TokenResponse;
-import com.funrec.repository.mapper.UserMapper;
-import com.funrec.repository.entity.UserEntity;
+import com.rec.common.model.request.*;
+import com.rec.common.model.response.TokenResponse;
+import com.rec.repository.mapper.UserMapper;
+import com.rec.repository.entity.UserEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -2835,13 +2835,13 @@ public class AuthHandler {
 - [ ] **Step 2: 创建 UserHandler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.request.UserUpdateRequest;
-import com.funrec.common.model.response.*;
-import com.funrec.repository.mapper.*;
-import com.funrec.repository.entity.*;
-import com.funrec.repository.redis.UserProfileRedisRepository;
+import com.rec.common.model.request.UserUpdateRequest;
+import com.rec.common.model.response.*;
+import com.rec.repository.mapper.*;
+import com.rec.repository.entity.*;
+import com.rec.repository.redis.UserProfileRedisRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -2928,18 +2928,18 @@ git commit -m "feat: add Auth and User handlers"
 ### Task 16: API — Movie + Rating Handler
 
 **Files:**
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/MovieHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/RatingHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/MovieHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/RatingHandler.java`
 
 - [ ] **Step 1: 创建 MovieHandler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.request.MovieCreateRequest;
-import com.funrec.common.model.response.*;
-import com.funrec.repository.mapper.*;
-import com.funrec.repository.entity.*;
+import com.rec.common.model.request.MovieCreateRequest;
+import com.rec.common.model.response.*;
+import com.rec.repository.mapper.*;
+import com.rec.repository.entity.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -3048,13 +3048,13 @@ public class MovieHandler {
 - [ ] **Step 2: 创建 RatingHandler (含反馈闭环)**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.request.RatingCreateRequest;
-import com.funrec.common.model.response.*;
-import com.funrec.repository.mapper.*;
-import com.funrec.repository.entity.*;
-import com.funrec.repository.redis.UserProfileRedisRepository;
+import com.rec.common.model.request.RatingCreateRequest;
+import com.rec.common.model.response.*;
+import com.rec.repository.mapper.*;
+import com.rec.repository.entity.*;
+import com.rec.repository.redis.UserProfileRedisRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -3152,23 +3152,23 @@ git commit -m "feat: add Movie and Rating handlers with feedback loop"
 ### Task 17: API — Recommendation + Search + 其他 Handler
 
 **Files:**
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/RecommendationHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/SearchHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/GenreHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/PeopleHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/StatsHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/handler/HealthHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/RecommendationHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/SearchHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/GenreHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/PeopleHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/StatsHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/handler/HealthHandler.java`
 
 - [ ] **Step 1: 创建 RecommendationHandler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.request.UserFeaturesRequest;
-import com.funrec.common.model.response.*;
-import com.funrec.common.model.pipeline.RankedItem;
-import com.funrec.pipeline.RecommendationPipeline;
-import com.funrec.repository.mapper.MovieMapper;
+import com.rec.common.model.request.UserFeaturesRequest;
+import com.rec.common.model.response.*;
+import com.rec.common.model.pipeline.RankedItem;
+import com.rec.pipeline.RecommendationPipeline;
+import com.rec.repository.mapper.MovieMapper;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -3229,9 +3229,9 @@ public class RecommendationHandler {
 - [ ] **Step 2: 创建 SearchHandler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.repository.es.MovieSearchRepository;
+import com.rec.repository.es.MovieSearchRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -3268,10 +3268,10 @@ public class SearchHandler {
 - [ ] **Step 3: 创建 Genre + People + Stats + Health Handler**
 
 ```java
-package com.funrec.api.handler;
+package com.rec.api.handler;
 
-import com.funrec.common.model.response.*;
-import com.funrec.repository.mapper.*;
+import com.rec.common.model.response.*;
+import com.rec.repository.mapper.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
@@ -3363,16 +3363,16 @@ git commit -m "feat: add Recommendation, Search, Genre, People, Stats and Health
 ### Task 18: API — Router + Global Error Handler + Application
 
 **Files:**
-- Create: `recommend-api/src/main/java/com/funrec/api/router/ApiRouter.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/error/GlobalErrorWebExceptionHandler.java`
-- Create: `recommend-api/src/main/java/com/funrec/api/RecommendApplication.java`
+- Create: `recommend-api/src/main/java/com/rec/api/router/ApiRouter.java`
+- Create: `recommend-api/src/main/java/com/rec/api/error/GlobalErrorWebExceptionHandler.java`
+- Create: `recommend-api/src/main/java/com/rec/api/RecommendApplication.java`
 
 - [ ] **Step 1: 创建 ApiRouter**
 
 ```java
-package com.funrec.api.router;
+package com.rec.api.router;
 
-import com.funrec.api.handler.*;
+import com.rec.api.handler.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.*;
@@ -3428,9 +3428,9 @@ public class ApiRouter {
 - [ ] **Step 2: 创建 GlobalErrorWebExceptionHandler**
 
 ```java
-package com.funrec.api.error;
+package com.rec.api.error;
 
-import com.funrec.common.exception.*;
+import com.rec.common.exception.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -3502,14 +3502,14 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
 - [ ] **Step 3: 创建 RecommendApplication**
 
 ```java
-package com.funrec.api;
+package com.rec.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
-@SpringBootApplication(scanBasePackages = "com.funrec")
-@ConfigurationPropertiesScan(basePackages = "com.funrec")
+@SpringBootApplication(scanBasePackages = "com.rec")
+@ConfigurationPropertiesScan(basePackages = "com.rec")
 public class RecommendApplication {
 
     public static void main(String[] args) {
@@ -3547,15 +3547,15 @@ server:
 
 spring:
   application:
-    name: funrec-recommend-service
+    name: rec-recommend-service
   threads:
     virtual:
       enabled: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/funrec_db
-    username: funrec
-    password: funrec123
+    url: jdbc:postgresql://localhost:5432/rec_db
+    username: rec
+    password: rec123
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
