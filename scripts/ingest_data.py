@@ -1,7 +1,6 @@
 """Import MovieLens 1M + IMDb data from pickle files into PostgreSQL, ES, and Redis.
 
-Data source: funrec-movielens-1m/{movies,users,ratings}.pkl + movie_metadata.pkl
-Poster images: funrec-movielens-1m/image/{movie_id}.png
+Data source: scripts/data/{movies,users,ratings}.pkl + movie_metadata.pkl + image.zip
 
 Usage:
     python scripts/ingest_data.py [--data-dir PATH] [--skip-ratings] [--create-test-user]
@@ -20,7 +19,7 @@ import psycopg2
 from psycopg2.extras import execute_values
 
 PG_DSN = os.environ.get("PG_DSN", "dbname=rec_db user=rec password=rec123 host=localhost port=5432")
-DEFAULT_DATA_DIR = Path(__file__).resolve().parent / "data" / "funrec-movielens-1m"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parent / "data"
 BATCH = 5000
 
 
@@ -285,17 +284,20 @@ def import_genres(conn, df_movies):
 
 
 def copy_posters(data_dir):
-    """Copy poster images to a location nginx can serve."""
-    src = data_dir / "image"
+    """Extract poster images from image.zip to a location nginx can serve."""
+    import zipfile
+    zip_path = data_dir / "image.zip"
     dst = Path(__file__).resolve().parent.parent / "data" / "posters"
     dst.mkdir(parents=True, exist_ok=True)
     count = 0
-    for img in src.glob("*.png"):
-        target = dst / img.name
-        if not target.exists():
-            target.write_bytes(img.read_bytes())
-        count += 1
-    log(f"Posters: {count} copied to {dst}")
+    with zipfile.ZipFile(zip_path) as zf:
+        for name in zf.namelist():
+            if name.endswith('.png'):
+                target = dst / Path(name).name
+                if not target.exists():
+                    target.write_bytes(zf.read(name))
+                count += 1
+    log(f"Posters: {count} extracted to {dst}")
 
 
 def create_test_user(conn):
