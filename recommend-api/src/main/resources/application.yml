@@ -1,0 +1,87 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: funrec-recommend-service
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/funrec_db
+    username: funrec
+    password: funrec123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+
+    elasticsearch:
+      client:
+        reactive:
+          endpoints: localhost:9200
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+recommend:
+  rpc:
+    client: http
+    inference:
+      base-url: http://python-inference:8080
+      connect-timeout: 500
+      read-timeout: 2000
+      max-retries: 1
+
+  strategy:
+    recall:
+      user-preference:
+        enabled: true
+      youtubednn:
+        enabled: true
+      item-embedding:
+        enabled: true
+      global-trending:
+        enabled: false
+    ranking:
+      deepfm:
+        enabled: true
+      fallback:
+        enabled: true
+    reranking:
+      genre-dispersion:
+        enabled: true
+      decade-dispersion:
+        enabled: true
+    coldstart:
+      ucb-genre:
+        enabled: true
+      preferred-genre:
+        enabled: true
+      popular-recent:
+        enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics
