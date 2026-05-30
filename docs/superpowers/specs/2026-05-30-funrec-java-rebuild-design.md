@@ -139,6 +139,41 @@ Stage 4: 多样性重排 (内存计算, 无外部依赖)
   └── enrichWithMetadata: DB 查 title, genres, poster_url → HTTP JSON
 ```
 
+### 评分反馈闭环 (POST /api/ratings)
+
+用户每次评分后，同步更新 4 个存储，形成反馈闭环：
+
+```
+POST /api/ratings  {user_id, movie_id, rating}
+       │
+       ├── 1. PostgreSQL: INSERT/UPDATE ratings + UPDATE movies.avg_rating
+       ├── 2. ES: 同步评分到 movies 索引 (更新 avg_rating, rating_count)
+       ├── 3. Redis: LPUSH user:{id}:history  movie_id
+       ├── 4. Redis: HSET user:{id}:profile  重新计算 frequent_genres
+       └── 5. Redis: HINCRBY user:{id}:genre_ucb 更新 genre 探索/利用统计
+```
+
+这些更新对后续推荐请求立即生效：
+- Step 3 → 冷启动检测 (`histMovieIds.size()`) 实时反映最新评分
+- Step 4 → 召回阶段 `frequent_genres` 实时反映偏好变化
+- Step 5 → 冷启动 UCB 策略的探索/利用决策实时调整
+
+```java
+// RatingHandler 中:
+public Mono<ServerResponse> createRating(ServerRequest request) {
+    return request.bodyToMono(RatingCreate.class)
+        .flatMap(rating -> ratingService.saveRating(rating))           // 1. PG
+        .flatMap(rating -> esService.syncRating(rating))              // 2. ES
+        .flatMap(rating -> redisRepo.pushUserHistory(                 // 3. Redis history
+            rating.userId(), rating.movieId()))
+        .flatMap(rating -> updateFrequentGenres(rating.userId())      // 4. Redis profile
+            .thenReturn(rating))
+        .flatMap(rating -> redisRepo.updateUCBStats(                  // 5. Redis UCB
+            rating.userId(), getMovieGenre(rating.movieId()), rating.rating()))
+        .flatMap(rating -> ServerResponse.ok().bodyValue(rating));
+}
+```
+
 ### 召回 Snake Merge
 
 ```java
@@ -502,10 +537,28 @@ public class MovieEntity {
 ```java
 @Component
 public class UserProfileRedisRepository {
+
+    // ===== 读取 =====
+
     Mono<Map<String, String>> getUserProfile(Long userId);
+    // HGETALL user:{id}:profile → Hash(gender, age, occupation, zip_code, frequent_genres)
+
     Mono<List<Long>> getUserHistory(Long userId, int maxLen);
+    // LRANGE user:{id}:history 0 maxLen → List[movie_id]
+
     Mono<Map<String, UCBStat>> getUCBStats(Long userId);
+    // HGETALL user:{id}:genre_ucb → 每种 genre 的 {n, reward}
+
+    // ===== 写入 (评分反馈闭环) =====
+
+    Mono<Void> pushUserHistory(Long userId, Long movieId);
+    // LPUSH user:{id}:history movieId
+
+    Mono<Void> updateUserProfile(Long userId, Map<String, String> profile);
+    // HSET user:{id}:profile {gender, age, occupation, zip_code, frequent_genres...}
+
     Mono<Void> updateUCBStats(Long userId, String genre, int reward);
+    // HINCRBY user:{id}:genre_ucb {genre}.n 1 + HINCRBY {genre}.reward
 }
 ```
 
