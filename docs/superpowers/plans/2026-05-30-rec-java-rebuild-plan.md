@@ -1,8 +1,8 @@
-# FunRec Java/Spring Boot 重构实现计划
+# Rec Java/Spring Boot 重构实现计划
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 将 FunRec 电影推荐系统从 Python FastAPI 全量迁移到 Java 17 + Spring Boot 3.x (WebFlux)，包含 20 个 API 端点 + 在线推荐管线 + 策略模式 + RPC 模型调用。
+**Goal:** 将 Rec 电影推荐系统从 Python FastAPI 全量迁移到 Java 17 + Spring Boot 3.x (WebFlux)，包含 20 个 API 端点 + 在线推荐管线 + 策略模式 + RPC 模型调用。
 
 **Architecture:** Maven 多模块单体应用。recommend-common → recommend-repository → recommend-rpc → recommend-strategy → recommend-pipeline → recommend-api，逐级依赖。WebFlux 全链路响应式，策略通过 `@ConditionalOnProperty` + yml 驱动，模型推理通过 `ModelInferenceClient` 接口（HTTP 实现）调用 Python 推理服务。
 
@@ -191,7 +191,7 @@ recommend-service/
     <artifactId>recommend-service</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>FunRec Recommend Service</name>
+    <name>Rec Recommend Service</name>
 
     <properties>
         <java.version>17</java.version>

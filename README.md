@@ -1,4 +1,4 @@
-# FunRec — 电影推荐系统
+# Rec — 电影推荐系统
 
 基于 MovieLens 1M + IMDb 数据集的电影推荐系统，结合 Docker Compose 部署。
 
@@ -88,7 +88,7 @@ docker compose ps
 ### 测试用户
 
 ```
-邮箱: test@funrec.com
+邮箱: test@rec.dev
 密码: test123456
 ```
 

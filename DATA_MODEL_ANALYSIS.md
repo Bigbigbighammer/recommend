@@ -1,4 +1,4 @@
-# FunRec 电影推荐系统 — 数据模型与数据流分析
+# Rec 电影推荐系统 — 数据模型与数据流分析
 
 ## 项目概况
 
@@ -199,7 +199,7 @@ offline/    → 离线训练管线（特征工程 → 训练 → 部署）
 
 | 字段 | 默认值 | 说明 |
 |------|--------|------|
-| app_name | "FunRec" | 应用名 |
+| app_name | "Rec" | 应用名 |
 | app_version | "1.0.0" | 版本号 |
 | debug | False | 调试模式 |
 | database_url | postgresql://rec:rec123@localhost:5432/rec_db | PG 连接串 |

@@ -302,7 +302,7 @@ def copy_posters(data_dir):
 
 def create_test_user(conn):
     log("Creating test user ...")
-    email, password = "test@funrec.com", "test123456"
+    email, password = "test@rec.dev", "test123456"
     cur = conn.cursor()
     cur.execute("SELECT user_id FROM users WHERE email = %s", (email,))
     if cur.fetchone():

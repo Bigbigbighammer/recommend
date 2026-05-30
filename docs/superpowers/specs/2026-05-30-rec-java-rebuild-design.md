@@ -1,8 +1,8 @@
-# FunRec Java/Spring Boot 重构设计文档
+# Rec Java/Spring Boot 重构设计文档
 
 ## 概述
 
-将 FunRec 电影推荐系统从 Python FastAPI 重构为 Java 17 + Spring Boot 3.x，全量迁移 20 个 API 端点 + 在线推荐管线。离线模型训练保留 Python，Java 在线层通过 HTTP/gRPC 与 Python 推理服务通信。
+将 Rec 电影推荐系统从 Python FastAPI 重构为 Java 17 + Spring Boot 3.x，全量迁移 20 个 API 端点 + 在线推荐管线。离线模型训练保留 Python，Java 在线层通过 HTTP/gRPC 与 Python 推理服务通信。
 
 ### 当前系统 (Python)
 

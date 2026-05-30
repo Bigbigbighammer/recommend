@@ -427,7 +427,7 @@ def ingest_genres(db: Session, df_movies: pd.DataFrame):
     return list(all_genres)
 
 
-def create_test_user(db: Session, email: str = "test@funrec.com", password: str = "test123456"):
+def create_test_user(db: Session, email: str = "test@rec.dev", password: str = "test123456"):
     """创建用于开发的测试超级用户（偏好科幻类型）"""
     print("\n=== 创建测试超级用户 ===")
     
@@ -505,8 +505,8 @@ def main():
     # 数据目录 - 使用正确的路径
     if args.data_dir:
         data_dir = Path(args.data_dir)
-    elif os.getenv("FUNREC_RAW_DATA_PATH"):
-        data_dir = Path(os.getenv("FUNREC_RAW_DATA_PATH"))
+    elif os.getenv("REC_RAW_DATA_PATH"):
+        data_dir = Path(os.getenv("REC_RAW_DATA_PATH"))
     else:
         data_dir = Path(settings.data_dir)
     
@@ -604,7 +604,7 @@ def main():
         
         if args.create_test_user:
             print("\n📍 测试超级用户创建成功:")
-            print("   邮箱: test@funrec.com")
+            print("   邮箱: test@rec.dev")
             print("   密码: test123456")
             print("   超级用户: 是 (可以添加电影)")
             print("   偏好类型: Sci-Fi (用于冷启动)")
