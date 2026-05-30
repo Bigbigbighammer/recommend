@@ -18,6 +18,10 @@
         </dependency>
         <dependency>
             <groupId>com.funrec</groupId>
+            <artifactId>recommend-repository</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.funrec</groupId>
             <artifactId>recommend-strategy</artifactId>
         </dependency>
         <dependency>
