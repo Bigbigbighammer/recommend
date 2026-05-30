@@ -45,7 +45,7 @@ public class DeepFMRankingStrategy implements RankingStrategy {
                 })
                 .collect(Collectors.toList());
 
-        var request = new RankingRequest(userFeatures, itemFeatureList, null);
+        var request = new RankingRequest(userFeatures, itemFeatureList, "");
 
         return rpcClient.predictCTR(request)
                 .map(predictions -> {

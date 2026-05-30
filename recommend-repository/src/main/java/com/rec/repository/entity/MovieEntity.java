@@ -5,7 +5,7 @@ import com.rec.repository.config.ArrayTypeHandler;
 import lombok.Data;
 
 @Data
-@TableName("movies")
+@TableName(value = "movies", autoResultMap = true)
 public class MovieEntity {
     @TableId(type = IdType.AUTO)
     private Long movieId;
@@ -24,5 +24,6 @@ public class MovieEntity {
     private String titleType;
     private Integer runtimeMinutes;
     private Integer isAdult;
+    private String posterUrl;
     private Long createdBy;
 }

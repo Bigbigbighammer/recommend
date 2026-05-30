@@ -38,7 +38,15 @@ public class UserFeatureEnrichmentStage {
                     }
                 }
                 PipelineContext enrichedCtx = ctx.withUserFeatures(enriched);
-                if (!history.isEmpty()) enrichedCtx = enrichedCtx.withHistMovieIds(history);
+                if (!history.isEmpty()) {
+                    enrichedCtx = enrichedCtx.withHistMovieIds(history);
+                } else {
+                    @SuppressWarnings("unchecked")
+                    var reqHist = (List<Long>) ctx.userFeatures().get("histMovieIds");
+                    if (reqHist != null && !reqHist.isEmpty()) {
+                        enrichedCtx = enrichedCtx.withHistMovieIds(reqHist);
+                    }
+                }
                 return Mono.just(enrichedCtx);
             });
     }

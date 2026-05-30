@@ -6,7 +6,7 @@ import com.rec.repository.config.ArrayTypeHandler;
 import lombok.Data;
 
 @Data
-@TableName("title_crew")
+@TableName(value = "title_crew", autoResultMap = true)
 public class TitleCrewEntity {
     private String tconst;
 

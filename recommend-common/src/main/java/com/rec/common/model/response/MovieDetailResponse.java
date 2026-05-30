@@ -14,5 +14,6 @@ public record MovieDetailResponse(
     Double imdbRating,
     Integer imdbVotes,
     Integer runtimeMinutes,
-    String titleType
+    String titleType,
+    String posterUrl
 ) {}

@@ -2,7 +2,10 @@
   <div class="detail" v-if="movie">
     <div class="hero">
       <div class="container">
-        <h1>{{ movie.title }}</h1>
+        <div class="hero-layout">
+          <img v-if="movie.posterUrl" :src="movie.posterUrl" :alt="movie.title" class="hero-poster" />
+          <div class="hero-content">
+            <h1>{{ movie.title }}</h1>
         <div class="hero-meta">
           <span v-if="movie.year">{{ movie.year }}</span>
           <span v-if="movie.runtimeMinutes || movie.runtime_minutes">{{ movie.runtimeMinutes || movie.runtime_minutes }} min</span>
@@ -16,6 +19,8 @@
         <div class="rating-box" v-if="movie.avgRating || movie.avg_rating">
           <div class="avg">{{ (movie.avgRating || movie.avg_rating).toFixed(1) }}</div>
           <div class="label">avg rating</div>
+        </div>
+          </div>
         </div>
       </div>
     </div>
@@ -79,6 +84,10 @@ onMounted(async () => {
 
 <style scoped>
 .hero { padding: 3rem 0 2.5rem; margin: 0; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, rgba(200,164,92,.05) 0%, transparent 100%); }
+.hero-layout { display: flex; gap: 2rem; align-items: flex-start; }
+.hero-poster { width: 200px; border-radius: var(--radius); box-shadow: 0 4px 20px rgba(0,0,0,.5); flex-shrink: 0; }
+.hero-content { flex: 1; min-width: 0; }
+@media (max-width: 640px) { .hero-layout { flex-direction: column; } .hero-poster { width: 140px; } }
 .hero-meta { display: flex; gap: 1rem; margin-top: .5rem; font-size: .75rem; color: var(--text-muted); }
 .imdb { color: var(--gold); }
 .genre-tags { display: flex; gap: .4rem; margin-top: 1rem; flex-wrap: wrap; }

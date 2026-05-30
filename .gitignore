@@ -27,3 +27,21 @@ application-local.yml
 
 # Build
 *.class
+
+# Claude
+.claude/
+
+# Frontend test artifacts
+frontend/playwright-report/
+frontend/test-results/
+
+# Data files (too large)
+data/
+scripts/data/*.zip
+scripts/data/*.gz
+scripts/data/*.pkl
+scripts/data/funrec-movielens-1m/
+
+# Python
+*.pyc
+__pycache__/

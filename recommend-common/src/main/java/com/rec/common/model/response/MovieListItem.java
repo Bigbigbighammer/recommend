@@ -8,5 +8,6 @@ public record MovieListItem(
     Integer year,
     List<String> genres,
     Double avgRating,
-    Double imdbRating
+    Double imdbRating,
+    String posterUrl
 ) {}

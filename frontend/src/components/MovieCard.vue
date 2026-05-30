@@ -1,7 +1,8 @@
 <template>
   <router-link :to="`/movie/${movie.movieId || movie.movie_id}`" class="card">
     <div class="poster">
-      <div class="poster-placeholder">
+      <img v-if="poster" :src="poster" :alt="movie.title" class="poster-img" loading="lazy" @error="onError" />
+      <div v-else class="poster-placeholder">
         <span class="poster-year">{{ movie.year || '' }}</span>
         <span class="poster-icon">&#127916;</span>
       </div>
@@ -22,13 +23,27 @@
 </template>
 
 <script setup>
-defineProps({ movie: Object })
+import { computed, ref } from 'vue'
+
+const props = defineProps({ movie: Object })
+
+const failed = ref(false)
+
+const poster = computed(() => {
+  if (failed.value) return null
+  return props.movie.posterUrl || null
+})
+
+function onError() {
+  failed.value = true
+}
 </script>
 
 <style scoped>
 .card { display: block; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .2s ease; }
 .card:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
 .poster { aspect-ratio: 2/3; overflow: hidden; }
+.poster-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .poster-placeholder {
   width: 100%; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem;

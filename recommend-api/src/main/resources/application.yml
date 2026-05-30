@@ -42,6 +42,10 @@ mybatis-plus:
       id-type: auto
 
 recommend:
+  embedding:
+    item-emb-path: ${RECOMMEND_EMBEDDING_ITEM_EMB_PATH:/app/data/item_emb.npy}
+    movie-ids-path: ${RECOMMEND_EMBEDDING_MOVIE_IDS_PATH:/app/data/movie_ids.npy}
+
   rpc:
     client: http
     inference:

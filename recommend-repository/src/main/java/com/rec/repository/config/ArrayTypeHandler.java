@@ -3,10 +3,12 @@ package com.rec.repository.config;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
+import org.springframework.stereotype.Component;
 import java.sql.*;
 import java.util.Arrays;
 
 @MappedTypes(String[].class)
+@Component
 public class ArrayTypeHandler extends BaseTypeHandler<String[]> {
 
     @Override
@@ -20,7 +22,6 @@ public class ArrayTypeHandler extends BaseTypeHandler<String[]> {
     }
 
     private String[] getArraySafe(ResultSet rs, String columnName, int columnIndex, boolean byName) throws SQLException {
-        // Try PG-native getArray() first
         try {
             Array a = byName ? rs.getArray(columnName) : rs.getArray(columnIndex);
             if (a != null) {
@@ -30,9 +31,11 @@ public class ArrayTypeHandler extends BaseTypeHandler<String[]> {
                     return Arrays.stream(oa).map(Object::toString).toArray(String[]::new);
                 }
             }
-        } catch (SQLException | NumberFormatException ignored) { /* fallback */ }
+            return null;
+        } catch (SQLException | NumberFormatException ignored) {
+            // getArray failed — column not consumed, fallback to getString()
+        }
 
-        // Fallback: getString() — handles PG literal {a,b,c} or H2 a,b,c
         String raw = byName ? rs.getString(columnName) : rs.getString(columnIndex);
         if (raw == null || raw.isBlank()) return null;
         if (raw.startsWith("{") && raw.endsWith("}")) {

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("users")
+@TableName(value = "users", autoResultMap = true)
 public class UserEntity {
     @TableId(type = IdType.AUTO)
     private Long userId;

@@ -60,7 +60,7 @@ public class MovieHandler {
         var movies = movieMapper.selectList(null);
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
             m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
-            m.getAvgRating(), m.getImdbRating())).collect(Collectors.toList());
+            m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
         return ServerResponse.ok().bodyValue(new MovieListResponse(items, movies.size(), page, size, false));
     }
 
@@ -68,7 +68,7 @@ public class MovieHandler {
         var movies = movieMapper.findPopular(20);
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
             m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
-            m.getAvgRating(), m.getImdbRating())).collect(Collectors.toList());
+            m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
         return ServerResponse.ok().bodyValue(items);
     }
 
@@ -79,7 +79,7 @@ public class MovieHandler {
         return ServerResponse.ok().bodyValue(new MovieDetailResponse(m.getMovieId(), m.getImdbId(), m.getTitle(),
             m.getYear(), m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
             m.getDescription(), m.getAvgRating(), m.getRatingCount(),
-            m.getImdbRating(), m.getImdbVotes(), m.getRuntimeMinutes(), m.getTitleType()));
+            m.getImdbRating(), m.getImdbVotes(), m.getRuntimeMinutes(), m.getTitleType(), m.getPosterUrl()));
     }
 
     public Mono<ServerResponse> cast(ServerRequest request) {
@@ -103,9 +103,20 @@ public class MovieHandler {
         var movie = movieMapper.selectById(id);
         if (movie == null || movie.getImdbId() == null) return ServerResponse.notFound().build();
         var crew = titleCrewMapper.findByTconst(movie.getImdbId());
+        String[] directors = crew != null ? toNames(crew.getDirectors()) : new String[]{};
+        String[] writers = crew != null ? toNames(crew.getWriters()) : new String[]{};
         return ServerResponse.ok().bodyValue(Map.of(
             "movie_id", id, "movie_title", movie.getTitle(),
-            "directors", crew != null && crew.getDirectors() != null ? crew.getDirectors() : new String[]{},
-            "writers", crew != null && crew.getWriters() != null ? crew.getWriters() : new String[]{}));
+            "directors", directors, "writers", writers));
+    }
+
+    private String[] toNames(String[] nconsts) {
+        if (nconsts == null) return new String[]{};
+        return Arrays.stream(nconsts)
+            .map(nconst -> {
+                var nb = nameBasicsMapper.findByNconst(nconst);
+                return nb != null ? nb.getPrimaryName() : nconst;
+            })
+            .toArray(String[]::new);
     }
 }
