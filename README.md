@@ -39,6 +39,18 @@ docker compose ps
 # 下载数据集（约 300MB 压缩包，解压后 ~2GB）
 wget https://funrec-datasets.s3.eu-west-3.amazonaws.com/funrec-movielens-1m.zip
 unzip funrec-movielens-1m.zip -d scripts/data/
+# zip 内有一层目录，把里面的文件移到 scripts/data/
+mv scripts/data/funrec-movielens-1m/* scripts/data/
+rmdir scripts/data/funrec-movielens-1m
+
+# 最终目录结构：
+#   scripts/data/
+#     ├── movies.pkl          (3883 movies，含 IMDb 元数据)
+#     ├── users.pkl           (6040 users)
+#     ├── ratings.pkl         (1,000,209 ratings)
+#     ├── movie_metadata.pkl  (title_ratings, name_basics, title_crew,
+#     │                          title_principals, title_akas)
+#     └── image.zip           (3883 poster PNGs, as {movie_id}.png)
 
 # 安装 Python 依赖
 pip install pandas psycopg2-binary redis
