@@ -6,13 +6,14 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @ConditionalOnProperty(name = "recommend.strategy.reranking.genre-dispersion.enabled", havingValue = "true", matchIfMissing = true)
 public class GenreDispersionStrategy implements RerankingStrategy {
+
+    private static final int MAX_CONSECUTIVE = 2;
 
     @Override
     public String getName() {
@@ -21,31 +22,45 @@ public class GenreDispersionStrategy implements RerankingStrategy {
 
     @Override
     public Mono<List<RankedItem>> rerank(List<RankedItem> items, Map<String, Object> userFeatures) {
-        List<RankedItem> result = new ArrayList<>(items);
+        if (items.size() <= MAX_CONSECUTIVE) {
+            return Mono.just(new ArrayList<>(items));
+        }
+
+        List<RankedItem> result = new ArrayList<>();
         List<RankedItem> deferred = new ArrayList<>();
-        for (int i = 0; i < result.size(); i++) {
-            if (sameGenreCount(result, i) >= 2) {
-                deferred.add(result.remove(i));
-                i--;
+
+        for (RankedItem item : items) {
+            if (canAdd(item, result)) {
+                result.add(item);
+                tryInsertDeferred(result, deferred);
+            } else {
+                deferred.add(item);
             }
         }
         result.addAll(deferred);
         return Mono.just(result);
     }
 
-    private int sameGenreCount(List<RankedItem> items, int pos) {
-        if (pos < 1) {
-            return 0;
+    private boolean canAdd(RankedItem item, List<RankedItem> result) {
+        if (result.size() < MAX_CONSECUTIVE) return true;
+        List<String> itemGenres = item.genres();
+        if (itemGenres == null || itemGenres.isEmpty()) return true;
+
+        String key = itemGenres.get(0);
+        int check = Math.min(MAX_CONSECUTIVE - 1, result.size());
+        for (int i = result.size() - 1; i >= result.size() - check; i--) {
+            List<String> prevGenres = result.get(i).genres();
+            if (prevGenres == null || prevGenres.isEmpty()) return true;
+            if (!key.equals(prevGenres.get(0))) return true;
         }
-        var current = items.get(pos).genres();
-        int count = 0;
-        for (int i = pos - 1; i >= 0 && i >= pos - 2; i--) {
-            if (!Collections.disjoint(current, items.get(i).genres())) {
-                count++;
-            } else {
-                break;
+        return false;
+    }
+
+    private void tryInsertDeferred(List<RankedItem> result, List<RankedItem> deferred) {
+        for (int i = deferred.size() - 1; i >= 0; i--) {
+            if (canAdd(deferred.get(i), result)) {
+                result.add(deferred.remove(i));
             }
         }
-        return count;
     }
 }

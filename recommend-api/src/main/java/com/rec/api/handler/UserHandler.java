@@ -31,7 +31,7 @@ public class UserHandler {
         if (user == null) return ServerResponse.notFound().build();
 
         List<RatingResponse> recentRatings = ratingMapper.findRecentByUser(userId, 10)
-            .stream().map(r -> new RatingResponse(r.getUserId(), r.getMovieId(), r.getRating(), r.getTimestamp()))
+            .stream().map(r -> new RatingResponse(r.getUserId(), r.getMovieId(), r.getTitle(), r.getRating(), r.getTimestamp()))
             .collect(Collectors.toList());
 
         var profile = new UserProfileResponse(user.getUserId(), user.getEmail(), user.getUsername(),
@@ -60,7 +60,6 @@ public class UserHandler {
     }
 
     private Long extractUserId(ServerRequest request) {
-        // Placeholder: extract from JWT/path; for MVP returns default
-        return 1L;
+        return AuthUtil.extractUserId(request);
     }
 }

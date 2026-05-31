@@ -19,8 +19,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-const isLoggedIn = computed(() => !!localStorage.getItem('token'))
+import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const isLoggedIn = ref(!!localStorage.getItem('token'))
+
+watch(() => router.currentRoute.value, () => {
+  isLoggedIn.value = !!localStorage.getItem('token')
+}, { immediate: true })
 </script>
 
 <style scoped>

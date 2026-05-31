@@ -46,10 +46,27 @@ const recommendations = ref([])
 const popular = ref([])
 const movies = ref([])
 
+function buildRecRequest() {
+  const body = {}
+  const token = localStorage.getItem('token')
+  if (token) {
+    try {
+      const decoded = atob(token)
+      const parts = decoded.split(':')
+      if (parts.length >= 1) body.userId = parseInt(parts[0], 10)
+    } catch {}
+  }
+  const genresStr = localStorage.getItem('preferredGenres')
+  if (genresStr) {
+    try { body.preferredGenres = JSON.parse(genresStr) } catch {}
+  }
+  return body
+}
+
 onMounted(async () => {
   try {
     const [recData, popData, movData] = await Promise.all([
-      api.getRecommendations({}).catch(() => ({ items: [] })),
+      api.getRecommendations(buildRecRequest()).catch(() => ({ items: [] })),
       api.getPopular().catch(() => []),
       api.getMovies(1, 20).catch(() => ({ items: [] })),
     ])

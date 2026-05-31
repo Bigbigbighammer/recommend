@@ -21,11 +21,11 @@ public class MovieSearchRepository {
     public Flux<MovieSearchResult> searchByGenres(List<String> genres, int topK) {
         CriteriaQuery query;
         if (genres == null || genres.isEmpty()) {
-            Criteria criteria = new Criteria("avg_rating").greaterThanEqual(5);
+            Criteria criteria = new Criteria("avgRating").greaterThanEqual(5);
             query = new CriteriaQuery(criteria);
         } else {
             Criteria criteria = new Criteria("genres").in(genres)
-                .and(new Criteria("avg_rating").greaterThanEqual(5));
+                .and(new Criteria("avgRating").greaterThanEqual(5));
             query = new CriteriaQuery(criteria);
         }
         query.setMaxResults(topK);

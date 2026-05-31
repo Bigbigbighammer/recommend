@@ -46,8 +46,11 @@ public class RecommendationHandler {
                         var movie = movieMapper.selectById(item.movieId());
                         return new RecommendationItemResponse(item.movieId(),
                             movie != null ? movie.getTitle() : "",
-                            movie != null && movie.getGenres() != null ? Arrays.asList(movie.getGenres()) : List.of(),
-                            item.score(), null, item.recallType(), null);
+                            movie != null && movie.getGenres() != null
+                                ? Arrays.stream(movie.getGenres()).map(GenreHandler::normalize).toList()
+                                : List.of(),
+                            item.score(), null, item.recallType(),
+                            movie != null ? movie.getPosterUrl() : null);
                     })
                     .collect(Collectors.toList());
                 return ServerResponse.ok().bodyValue(new RecommendationResponse(items, items.size(), "deepfm"));

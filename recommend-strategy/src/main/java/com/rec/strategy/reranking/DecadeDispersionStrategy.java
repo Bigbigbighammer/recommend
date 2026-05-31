@@ -13,6 +13,8 @@ import java.util.Map;
 @ConditionalOnProperty(name = "recommend.strategy.reranking.decade-dispersion.enabled", havingValue = "true", matchIfMissing = true)
 public class DecadeDispersionStrategy implements RerankingStrategy {
 
+    private static final int MAX_CONSECUTIVE = 3;
+
     @Override
     public String getName() {
         return "decade_dispersion";
@@ -20,31 +22,43 @@ public class DecadeDispersionStrategy implements RerankingStrategy {
 
     @Override
     public Mono<List<RankedItem>> rerank(List<RankedItem> items, Map<String, Object> userFeatures) {
-        List<RankedItem> result = new ArrayList<>(items);
+        if (items.size() <= MAX_CONSECUTIVE) {
+            return Mono.just(new ArrayList<>(items));
+        }
+
+        List<RankedItem> result = new ArrayList<>();
         List<RankedItem> deferred = new ArrayList<>();
-        for (int i = 0; i < result.size(); i++) {
-            if (sameDecadeCount(result, i) >= 2) {
-                deferred.add(result.remove(i));
-                i--;
+
+        for (RankedItem item : items) {
+            if (canAdd(item, result)) {
+                result.add(item);
+                tryInsertDeferred(result, deferred);
+            } else {
+                deferred.add(item);
             }
         }
         result.addAll(deferred);
         return Mono.just(result);
     }
 
-    private int sameDecadeCount(List<RankedItem> items, int pos) {
-        if (pos < 1) {
-            return 0;
+    private boolean canAdd(RankedItem item, List<RankedItem> result) {
+        if (result.size() < MAX_CONSECUTIVE) return true;
+        int itemDecade = item.year() / 10;
+        if (itemDecade < 190 || itemDecade > 210) return true;
+
+        int check = Math.min(MAX_CONSECUTIVE - 1, result.size());
+        for (int i = result.size() - 1; i >= result.size() - check; i--) {
+            int prevDecade = result.get(i).year() / 10;
+            if (prevDecade != itemDecade) return true;
         }
-        int currentDecade = items.get(pos).year() / 10;
-        int count = 0;
-        for (int i = pos - 1; i >= 0 && i >= pos - 2; i--) {
-            if (items.get(i).year() / 10 == currentDecade) {
-                count++;
-            } else {
-                break;
+        return false;
+    }
+
+    private void tryInsertDeferred(List<RankedItem> result, List<RankedItem> deferred) {
+        for (int i = deferred.size() - 1; i >= 0; i--) {
+            if (canAdd(deferred.get(i), result)) {
+                result.add(deferred.remove(i));
             }
         }
-        return count;
     }
 }

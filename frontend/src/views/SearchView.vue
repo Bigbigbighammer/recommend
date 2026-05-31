@@ -1,5 +1,8 @@
 <template>
   <div class="search-page">
+    <div class="back-bar container">
+      <a href="#" class="back-link" @click.prevent="$router.back()">← Back</a>
+    </div>
     <div class="hero">
       <div class="container">
         <h1>Search</h1>
@@ -46,6 +49,9 @@ async function search() {
 </script>
 
 <style scoped>
+.back-bar { padding: 1rem 0 0; }
+.back-link { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.back-link:hover { color: var(--gold); }
 .search-bar { display: flex; gap: .5rem; margin-top: 1.5rem; max-width: 520px; }
 .search-bar input { flex: 1; }
 .section { margin-top: 2rem; }

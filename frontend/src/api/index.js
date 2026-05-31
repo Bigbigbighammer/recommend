@@ -7,8 +7,17 @@ async function request(path, options = {}) {
 
   const res = await fetch(BASE + path, { ...options, headers })
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }))
-    throw new Error(err.message || err.code || 'Request failed')
+    let message = 'Something went wrong'
+    try {
+      const err = await res.json()
+      message = err.message || err.code || message
+    } catch {
+      const text = await res.text().catch(() => '')
+      if (text) message = text
+      else if (res.status === 401) message = 'Invalid email or password'
+      else if (res.status >= 500) message = 'Server error, please try again later'
+    }
+    throw new Error(message)
   }
   return res.json()
 }

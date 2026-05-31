@@ -25,7 +25,13 @@ public class UserFeatureEnrichmentStage {
                 Map<String, String> profile = tuple.getT1();
                 List<Long> history = tuple.getT2();
                 Map<String, Object> enriched = new HashMap<>();
-                profile.forEach((k, v) -> enriched.put(k, v));
+                profile.forEach((k, v) -> {
+                    if ("preferredGenres".equals(k) && v != null && !v.isEmpty()) {
+                        enriched.put(k, java.util.Arrays.asList(v.split(",")));
+                    } else {
+                        enriched.put(k, v);
+                    }
+                });
                 if (!history.isEmpty()) enriched.put("histMovieIds", history);
                 // DB fallback
                 if (profile.isEmpty()) {
@@ -35,6 +41,9 @@ public class UserFeatureEnrichmentStage {
                         if (user.getAge() != null) enriched.put("age", user.getAge());
                         if (user.getOccupation() != null) enriched.put("occupation", user.getOccupation());
                         if (user.getZipCode() != null) enriched.put("zipCode", user.getZipCode());
+                        if (user.getPreferredGenres() != null && user.getPreferredGenres().length > 0) {
+                            enriched.put("preferredGenres", java.util.Arrays.asList(user.getPreferredGenres()));
+                        }
                     }
                 }
                 PipelineContext enrichedCtx = ctx.withUserFeatures(enriched);

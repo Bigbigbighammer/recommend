@@ -32,10 +32,19 @@ public class ItemEmbeddingStore {
         this.embeddings = new HashMap<>(emb.length);
 
         for (int i = 0; i < emb.length; i++) {
-            embeddings.put(ids[i], emb[i]);
+            double[] vec = emb[i];
+            double norm = 0;
+            for (double v : vec) norm += v * v;
+            norm = Math.sqrt(norm);
+            if (norm > 0) {
+                for (int j = 0; j < vec.length; j++) {
+                    vec[j] /= norm;
+                }
+            }
+            embeddings.put(ids[i], vec);
         }
 
-        log.info("Loaded {} item embeddings, dimension={}", embeddings.size(), dimension);
+        log.info("Loaded {} item embeddings (L2-normalized), dimension={}", embeddings.size(), dimension);
     }
 
     public List<RecallItem> topK(List<Double> userVector, int k, Set<Long> excludeIds, String recallType) {
@@ -77,6 +86,39 @@ public class ItemEmbeddingStore {
             sum += a[i] * b[i];
         }
         return sum;
+    }
+
+    public double[] getEmbedding(long movieId) {
+        return embeddings.get(movieId);
+    }
+
+    public List<RecallItem> findSimilarItems(long queryMovieId, int k, Set<Long> excludeIds, String recallType) {
+        double[] queryEmb = embeddings.get(queryMovieId);
+        if (queryEmb == null) {
+            log.warn("Query movie {} not found in embedding store", queryMovieId);
+            return List.of();
+        }
+
+        PriorityQueue<RecallItem> heap = new PriorityQueue<>(
+            Comparator.comparingDouble(RecallItem::score));
+
+        for (var entry : embeddings.entrySet()) {
+            long movieId = entry.getKey();
+            if (movieId == queryMovieId) continue;
+            if (excludeIds.contains(movieId)) continue;
+
+            double score = dot(queryEmb, entry.getValue());
+            if (heap.size() < k) {
+                heap.offer(new RecallItem(movieId, score, recallType));
+            } else if (score > heap.peek().score()) {
+                heap.poll();
+                heap.offer(new RecallItem(movieId, score, recallType));
+            }
+        }
+
+        List<RecallItem> result = new ArrayList<>(heap);
+        result.sort((a, b) -> Double.compare(b.score(), a.score()));
+        return result;
     }
 
     public int getDimension() {

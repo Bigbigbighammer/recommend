@@ -1,8 +1,14 @@
 <template>
   <div class="profile" v-if="profile">
+    <div class="back-bar container">
+      <a href="#" class="back-link" @click.prevent="$router.back()">← Back</a>
+    </div>
     <div class="hero">
       <div class="container">
-        <h1>{{ profile.username }}</h1>
+        <div class="header-row">
+          <h1>{{ profile.username }}</h1>
+          <button class="logout-btn" @click="logout">Log out</button>
+        </div>
         <p class="email">{{ profile.email }}</p>
         <div class="stats-row">
           <div class="stat"><span class="num">{{ profile.recentRatings?.length || 0 }}</span> <span class="label">ratings</span></div>
@@ -29,15 +35,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '../api/index.js'
 
+const router = useRouter()
 const profile = ref(null)
 
 onMounted(async () => {
   try {
     profile.value = await api.getProfile()
   } catch (e) {
-    // Default profile for demo
     profile.value = {
       username: 'Guest',
       email: '',
@@ -47,12 +54,23 @@ onMounted(async () => {
   }
 })
 
+function logout() {
+  localStorage.removeItem('token')
+  router.push('/login')
+}
+
 function formatDate(ts) {
   return new Date(Number(ts)).toLocaleDateString()
 }
 </script>
 
 <style scoped>
+.back-bar { padding: 1rem 0 0; }
+.back-link { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+.back-link:hover { color: var(--gold); }
+.header-row { display: flex; align-items: center; justify-content: space-between; }
+.logout-btn { background: none; border: 1px solid var(--border); color: var(--text-muted); font-size: .7rem; padding: .35rem 1rem; border-radius: 4px; cursor: pointer; transition: border-color .15s, color .15s; }
+.logout-btn:hover { border-color: var(--text-muted); color: var(--text); }
 .email { font-size: .75rem; color: var(--text-muted); margin-top: .2rem; }
 .stats-row { display: flex; gap: 2rem; margin-top: 1.5rem; }
 .stat { display: flex; flex-direction: column; }

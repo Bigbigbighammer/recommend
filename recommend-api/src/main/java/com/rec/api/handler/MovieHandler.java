@@ -59,7 +59,9 @@ public class MovieHandler {
         int size = Integer.parseInt(request.queryParam("page_size").orElse("20"));
         var movies = movieMapper.selectList(null);
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
-            m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
+            m.getGenres() != null
+                ? Arrays.stream(m.getGenres()).map(GenreHandler::normalize).toList()
+                : List.of(),
             m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
         return ServerResponse.ok().bodyValue(new MovieListResponse(items, movies.size(), page, size, false));
     }
@@ -67,7 +69,9 @@ public class MovieHandler {
     public Mono<ServerResponse> popular(ServerRequest request) {
         var movies = movieMapper.findPopular(20);
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
-            m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
+            m.getGenres() != null
+                ? Arrays.stream(m.getGenres()).map(GenreHandler::normalize).toList()
+                : List.of(),
             m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
         return ServerResponse.ok().bodyValue(items);
     }
@@ -77,7 +81,9 @@ public class MovieHandler {
         var m = movieMapper.selectById(id);
         if (m == null) return ServerResponse.notFound().build();
         return ServerResponse.ok().bodyValue(new MovieDetailResponse(m.getMovieId(), m.getImdbId(), m.getTitle(),
-            m.getYear(), m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
+            m.getYear(), m.getGenres() != null
+                ? Arrays.stream(m.getGenres()).map(GenreHandler::normalize).toList()
+                : List.of(),
             m.getDescription(), m.getAvgRating(), m.getRatingCount(),
             m.getImdbRating(), m.getImdbVotes(), m.getRuntimeMinutes(), m.getTitleType(), m.getPosterUrl()));
     }

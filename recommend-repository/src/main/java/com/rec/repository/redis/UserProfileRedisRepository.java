@@ -50,6 +50,9 @@ public class UserProfileRedisRepository {
     }
 
     public Mono<Void> updateUserProfile(Long userId, Map<String, String> profile) {
+        if (profile.isEmpty()) {
+            return Mono.empty();
+        }
         return redis.opsForHash()
             .putAll("user:" + userId + ":profile", profile)
             .then();
@@ -59,6 +62,23 @@ public class UserProfileRedisRepository {
         String key = "user:" + userId + ":genre_ucb";
         return redis.opsForHash().increment(key, genre + ":n", 1)
             .then(redis.opsForHash().increment(key, genre + ":reward", reward))
+            .then();
+    }
+
+    public Mono<Long> removeUserHistory(Long userId, Long movieId) {
+        return redis.opsForList().remove("user:" + userId + ":history", 1, movieId.toString());
+    }
+
+    public Mono<Void> decrementUCBStats(Long userId, String genre, int reward) {
+        String key = "user:" + userId + ":genre_ucb";
+        return redis.opsForHash().increment(key, genre + ":n", -1)
+            .then(redis.opsForHash().increment(key, genre + ":reward", -reward))
+            .then();
+    }
+
+    public Mono<Void> updateUCBStatsDelta(Long userId, String genre, int delta) {
+        String key = "user:" + userId + ":genre_ucb";
+        return redis.opsForHash().increment(key, genre + ":reward", delta)
             .then();
     }
 }

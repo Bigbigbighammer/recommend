@@ -7,6 +7,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class GenreHandler {
 
@@ -17,7 +20,16 @@ public class GenreHandler {
     }
 
     public Mono<ServerResponse> list(ServerRequest request) {
-        return Mono.just(new GenreListResponse(genreMapper.findAllNames()))
+        List<String> genres = genreMapper.findAllNames().stream()
+            .map(GenreHandler::normalize)
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+        return Mono.just(new GenreListResponse(genres))
             .flatMap(r -> ServerResponse.ok().bodyValue(r));
+    }
+
+    public static String normalize(String genre) {
+        return genre.replace("''", "'");
     }
 }
