@@ -5,13 +5,15 @@
 ## 架构
 
 ```
-nginx (Vue 3 / :8088)  →  Java API (Spring WebFlux / :8082)
-                                ├── PostgreSQL 16 (:5432)
-                                ├── Redis 7 (:6379)
-                                ├── Elasticsearch 8 (:9200)
-                                └── Python Inference (:8081)
-                                    └── DeepFM + YouTubeDNN 模型
+nginx (Vue 3)  →  Java API (Spring WebFlux)
+                      ├── PostgreSQL 16
+                      ├── Redis 7
+                      ├── Elasticsearch 8
+                      └── Python Inference
+                          └── DeepFM + YouTubeDNN 模型
 ```
+
+> 端口映射以 `docker-compose.yml` 中 `ports` 配置为准。
 
 ## 前置要求
 
@@ -31,23 +33,17 @@ docker compose up -d postgres redis elasticsearch python-inference
 docker compose ps
 ```
 
-## 2. 导入数据
+## 2. 下载并导入数据
 
 ```bash
+# 下载数据集（约 300MB 压缩包，解压后 ~2GB）
+wget https://funrec-datasets.s3.eu-west-3.amazonaws.com/funrec-movielens-1m.zip
+unzip funrec-movielens-1m.zip -d scripts/data/
+
 # 安装 Python 依赖
 pip install pandas psycopg2-binary redis
 
-# 确保数据集放在 scripts/data/ 目录下，结构如下：
-#   scripts/data/
-#     ├── movies.pkl          (3883 movies，含 IMDb 元数据)
-#     ├── users.pkl           (6040 users)
-#     ├── ratings.pkl         (1,000,209 ratings)
-#     ├── movie_metadata.pkl  (title_ratings, name_basics, title_crew,
-#     │                          title_principals, title_akas)
-#     └── image.zip           (3883 poster PNGs, as {movie_id}.png)
-#
-# 数据集放置好后运行导入脚本：
-
+# 导入数据（PostgreSQL + Elasticsearch + Redis + posters）
 python scripts/ingest_data.py --create-test-user
 
 # 导入内容：
@@ -78,11 +74,13 @@ docker compose ps
 
 ## 5. 访问
 
-| 入口 | 地址 |
+端口以 `docker-compose.yml` 中 `ports` 映射为准（宿主机端口:容器端口）。
+
+| 入口 | 默认地址 |
 |------|------|
 | 前端 (Vue 3) | http://localhost:8088 |
-| Java API (Swagger) | http://localhost:8082/docs |
-| Python API | http://localhost:8081/docs |
+| Java API | http://localhost:8082 |
+| Python API | http://localhost:8081 |
 | Elasticsearch | http://localhost:9200 |
 
 ### 测试用户
