@@ -97,6 +97,7 @@ def import_movies(conn, df):
             _int(row.get('isAdult')),
             _float(row.get('averageRating')),
             _int(row.get('numVotes')),
+            f"/posters/{int(row['movie_id'])}.png",
         ))
         count += 1
         if len(batch) >= BATCH:
@@ -109,14 +110,14 @@ def import_movies(conn, df):
 
 def _flush_movies(cur, batch):
     execute_values(cur, """INSERT INTO movies
-        (movie_id, imdb_id, title, year, genres, description, title_type, runtime_minutes, is_adult, imdb_rating, imdb_votes, avg_rating, rating_count)
+        (movie_id, imdb_id, title, year, genres, description, title_type, runtime_minutes, is_adult, imdb_rating, imdb_votes, poster_url, avg_rating, rating_count)
         VALUES %s ON CONFLICT (movie_id) DO UPDATE SET
         imdb_id=EXCLUDED.imdb_id, title=EXCLUDED.title, year=EXCLUDED.year,
         genres=EXCLUDED.genres, description=EXCLUDED.description,
         title_type=EXCLUDED.title_type, runtime_minutes=EXCLUDED.runtime_minutes,
         is_adult=EXCLUDED.is_adult, imdb_rating=EXCLUDED.imdb_rating,
-        imdb_votes=EXCLUDED.imdb_votes""",
-        batch, template="(%s,%s,%s,%s,%s::text[],%s,%s,%s,%s,%s,%s,0,0)")
+        imdb_votes=EXCLUDED.imdb_votes, poster_url=EXCLUDED.poster_url""",
+        batch, template="(%s,%s,%s,%s,%s::text[],%s,%s,%s,%s,%s,%s,%s,0,0)")
 
 
 def import_users(conn, df):

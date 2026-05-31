@@ -29,6 +29,7 @@ CREATE TABLE movies (
     title_type      VARCHAR(50),
     runtime_minutes INTEGER,
     is_adult        SMALLINT DEFAULT 0,
+    poster_url      VARCHAR(500),
     created_by      INTEGER REFERENCES users(user_id)
 );
 
