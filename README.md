@@ -74,6 +74,17 @@ python scripts/generate_embeddings.py
 #       data/movie_ids.npy (3883 IDs)
 ```
 
+### 迁移旧数据库
+
+如果之前用旧版建表语句和脚本导入过数据，运行以下 SQL 补上 `poster_url` 列：
+
+```bash
+docker exec -i $(docker compose ps -q postgres) psql -U rec -d rec_db <<'SQL'
+ALTER TABLE movies ADD COLUMN IF NOT EXISTS poster_url VARCHAR(500);
+UPDATE movies SET poster_url = '/posters/' || movie_id || '.png' WHERE poster_url IS NULL;
+SQL
+```
+
 ## 4. 构建并启动全部服务
 
 ```bash
