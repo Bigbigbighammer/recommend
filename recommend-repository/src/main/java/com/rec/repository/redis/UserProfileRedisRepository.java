@@ -34,13 +34,16 @@ public class UserProfileRedisRepository {
     public Mono<Map<String, Map<String, Integer>>> getUCBStats(Long userId) {
         return redis.<String, String>opsForHash()
             .entries("user:" + userId + ":genre_ucb")
-            .collectMap(Map.Entry::getKey, e -> {
-                String[] parts = e.getValue().toString().split(":");
-                Map<String, Integer> stat = new HashMap<>();
-                stat.put("n", Integer.parseInt(parts[0]));
-                stat.put("reward", Integer.parseInt(parts[1]));
-                return stat;
-            });
+            .collect(
+                HashMap<String, Map<String, Integer>>::new,
+                (map, entry) -> {
+                    String[] parts = entry.getKey().split(":");
+                    String genre = parts[0];
+                    String field = parts[1];
+                    int val = Integer.parseInt(entry.getValue().toString());
+                    map.computeIfAbsent(genre, k -> new HashMap<>()).put(field, val);
+                }
+            );
     }
 
     // ===== Write =====

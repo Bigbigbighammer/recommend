@@ -15,4 +15,10 @@ public interface MovieMapper extends BaseMapper<MovieEntity> {
     @Select("SELECT * FROM movies WHERE genres && ARRAY[#{genre}]::text[] " +
             "AND avg_rating >= 5 ORDER BY year DESC, avg_rating DESC LIMIT #{limit}")
     List<MovieEntity> findByGenre(@Param("genre") String genre, @Param("limit") int limit);
+
+    @Select("SELECT * FROM movies ORDER BY movie_id ASC LIMIT #{limit} OFFSET #{offset}")
+    List<MovieEntity> findPage(@Param("offset") int offset, @Param("limit") int limit);
+
+    @Select("SELECT COUNT(*) FROM movies")
+    long countAll();
 }

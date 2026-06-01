@@ -56,14 +56,17 @@ public class MovieHandler {
 
     public Mono<ServerResponse> list(ServerRequest request) {
         int page = Integer.parseInt(request.queryParam("page").orElse("1"));
-        int size = Integer.parseInt(request.queryParam("page_size").orElse("20"));
-        var movies = movieMapper.selectList(null);
+        int size = Math.min(Integer.parseInt(request.queryParam("page_size").orElse("20")), 50);
+        int offset = (page - 1) * size;
+        var movies = movieMapper.findPage(offset, size);
+        long total = movieMapper.countAll();
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
             m.getGenres() != null
                 ? Arrays.stream(m.getGenres()).map(GenreHandler::normalize).toList()
                 : List.of(),
             m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
-        return ServerResponse.ok().bodyValue(new MovieListResponse(items, movies.size(), page, size, false));
+        boolean hasNext = (long) page * size < total;
+        return ServerResponse.ok().bodyValue(new MovieListResponse(items, (int) total, page, size, hasNext));
     }
 
     public Mono<ServerResponse> popular(ServerRequest request) {

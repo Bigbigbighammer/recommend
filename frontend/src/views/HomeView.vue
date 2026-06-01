@@ -9,11 +9,18 @@
       </div>
     </div>
 
-    <section class="container" v-if="recommendations.length">
-      <h2>For You</h2>
-      <div class="grid">
+    <section class="container">
+      <div class="section-head">
+        <h2>For You</h2>
+        <button class="refresh-btn" :disabled="refreshing" @click="refreshRecs">
+          <span :class="{ spinning: refreshing }">&#x21bb;</span> {{ refreshing ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+      <div class="grid" v-if="!recsReady"><div class="skel-card" v-for="n in 6" :key="'rs'+n"></div></div>
+      <div class="grid" v-else-if="recommendations.length">
         <MovieCard v-for="m in recommendations" :key="m.movieId || m.movie_id" :movie="m" />
       </div>
+      <p class="empty-hint" v-else>Rate some movies to get personalized recommendations.</p>
     </section>
 
     <section class="container section">
@@ -21,18 +28,18 @@
         <h2>Popular</h2>
         <router-link to="/search" class="link">View all &rarr;</router-link>
       </div>
-      <div class="grid">
+      <div class="grid" v-if="popular.length">
         <MovieCard v-for="m in popular" :key="m.movieId || m.movie_id" :movie="m" />
       </div>
+      <div class="grid" v-else><div class="skel-card" v-for="n in 6" :key="'ps'+n"></div></div>
     </section>
 
     <section class="container section">
-      <div class="section-head">
-        <h2>Latest</h2>
-      </div>
-      <div class="grid">
+      <div class="section-head"><h2>Latest</h2></div>
+      <div class="grid" v-if="movies.length">
         <MovieCard v-for="m in movies" :key="m.movieId || m.movie_id" :movie="m" />
       </div>
+      <div class="grid" v-else><div class="skel-card" v-for="n in 6" :key="'ls'+n"></div></div>
     </section>
   </div>
 </template>
@@ -45,6 +52,8 @@ import MovieCard from '../components/MovieCard.vue'
 const recommendations = ref([])
 const popular = ref([])
 const movies = ref([])
+const refreshing = ref(false)
+const recsReady = ref(false)
 
 function buildRecRequest() {
   const body = {}
@@ -63,14 +72,30 @@ function buildRecRequest() {
   return body
 }
 
-onMounted(async () => {
+async function loadRecommendations() {
   try {
-    const [recData, popData, movData] = await Promise.all([
-      api.getRecommendations(buildRecRequest()).catch(() => ({ items: [] })),
+    const recData = await api.getRecommendations(buildRecRequest()).catch(() => ({ items: [] }))
+    recommendations.value = recData.items || []
+  } catch (e) {
+    console.warn('Failed to load recommendations', e)
+  } finally {
+    recsReady.value = true
+  }
+}
+
+async function refreshRecs() {
+  refreshing.value = true
+  await loadRecommendations()
+  refreshing.value = false
+}
+
+onMounted(async () => {
+  setTimeout(loadRecommendations, 0)
+  try {
+    const [popData, movData] = await Promise.all([
       api.getPopular().catch(() => []),
       api.getMovies(1, 20).catch(() => ({ items: [] })),
     ])
-    recommendations.value = recData.items || []
     popular.value = Array.isArray(popData) ? popData : (popData.items || [])
     movies.value = movData.items || []
   } catch (e) {
@@ -94,6 +119,33 @@ onMounted(async () => {
 .section-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem; }
 .section-head h2 { font-size: 1.5rem; }
 .link { font-size: .7rem; text-transform: uppercase; letter-spacing: .05em; }
+.refresh-btn {
+  background: var(--bg-card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: .4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .75rem;
+  transition: all .2s;
+  display: flex; align-items: center; gap: .4rem;
+}
+.refresh-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
+.refresh-btn:disabled { opacity: .6; cursor: not-allowed; }
+.spinning { display: inline-block; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.empty-hint { font-size: .8rem; color: var(--text-muted); padding: 2rem 0; }
+.skel-card {
+  aspect-ratio: 2/3;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: .4; }
+  50% { opacity: .8; }
+}
 @media (max-width: 768px) {
   .hero h1 { font-size: 2rem; }
 }
