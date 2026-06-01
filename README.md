@@ -50,7 +50,7 @@ rmdir scripts/data/funrec-movielens-1m
 #     ├── ratings.pkl         (1,000,209 ratings)
 #     ├── movie_metadata.pkl  (title_ratings, name_basics, title_crew,
 #     │                          title_principals, title_akas)
-#     └── image.zip           (3883 poster PNGs, as {movie_id}.png)
+#     └── image/               (3883 poster PNGs, as {movie_id}.png)
 
 # 安装 Python 依赖
 pip install pandas psycopg2-binary redis

@@ -285,20 +285,17 @@ def import_genres(conn, df_movies):
 
 
 def copy_posters(data_dir):
-    """Extract poster images from image.zip to a location nginx can serve."""
-    import zipfile
-    zip_path = data_dir / "image.zip"
+    """Copy poster images from image/ directory to a location nginx can serve."""
+    src = data_dir / "image"
     dst = Path(__file__).resolve().parent.parent / "data" / "posters"
     dst.mkdir(parents=True, exist_ok=True)
     count = 0
-    with zipfile.ZipFile(zip_path) as zf:
-        for name in zf.namelist():
-            if name.endswith('.png'):
-                target = dst / Path(name).name
-                if not target.exists():
-                    target.write_bytes(zf.read(name))
-                count += 1
-    log(f"Posters: {count} extracted to {dst}")
+    for img in src.glob("*.png"):
+        target = dst / img.name
+        if not target.exists():
+            target.write_bytes(img.read_bytes())
+        count += 1
+    log(f"Posters: {count} copied to {dst}")
 
 
 def create_test_user(conn):
