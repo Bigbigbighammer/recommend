@@ -54,6 +54,22 @@ recommend:
       read-timeout: 2000
       max-retries: 1
 
+  recall-fusion:
+    weights: ${RECOMMEND_RECALL_FUSION_WEIGHTS:itemcf=2.0,usercf=1.8,ease=1.25,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.5,item_embedding=0.3,youtubednn=0.4,popular=0.05}
+    rrf-k: 60
+
+  recall-artifacts:
+    itemcf-path: ${RECOMMEND_RECALL_ITEMCF_PATH:/app/data/itemcf_sim.csv}
+    seqcf-path: ${RECOMMEND_RECALL_SEQCF_PATH:/app/data/seqcf_sim.csv}
+    ease-path: ${RECOMMEND_RECALL_EASE_PATH:/app/data/ease_sim.csv}
+    swing-path: ${RECOMMEND_RECALL_SWING_PATH:/app/data/swing_sim.csv}
+    usercf-sim-path: ${RECOMMEND_RECALL_USERCF_SIM_PATH:/app/data/usercf_sim.csv}
+    usercf-items-path: ${RECOMMEND_RECALL_USERCF_ITEMS_PATH:/app/data/user_positive_items.csv}
+    bpr-user-emb-path: ${RECOMMEND_RECALL_BPR_USER_EMB_PATH:/app/data/bpr_user_emb.npy}
+    bpr-user-ids-path: ${RECOMMEND_RECALL_BPR_USER_IDS_PATH:/app/data/bpr_user_ids.npy}
+    bpr-item-emb-path: ${RECOMMEND_RECALL_BPR_ITEM_EMB_PATH:/app/data/bpr_item_emb.npy}
+    bpr-movie-ids-path: ${RECOMMEND_RECALL_BPR_MOVIE_IDS_PATH:/app/data/bpr_movie_ids.npy}
+
   strategy:
     recall:
       user-preference:
@@ -61,6 +77,20 @@ recommend:
       youtubednn:
         enabled: true
       item-embedding:
+        enabled: true
+      itemcf:
+        enabled: true
+      seqcf:
+        enabled: true
+      ease:
+        enabled: true
+      swing:
+        enabled: true
+      usercf:
+        enabled: true
+      bpr:
+        enabled: false
+      popular:
         enabled: true
       global-trending:
         enabled: false

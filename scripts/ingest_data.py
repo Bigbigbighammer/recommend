@@ -364,14 +364,14 @@ def index_es(conn):
         count += 1
         if len(batch) >= 500:
             body = "\n".join(batch) + "\n"
-            req = urllib.request.Request(f"{ES_URL}/_bulk", data=body.encode(),
+            req = urllib.request.Request(f"{ES_URL}/movies/_bulk", data=body.encode(),
                 headers={"Content-Type": "application/x-ndjson"}, method="POST")
             urllib.request.urlopen(req)
             batch.clear()
             log(f"  {count:,} / {cur.rowcount:,} indexed ...")
     if batch:
         body = "\n".join(batch) + "\n"
-        req = urllib.request.Request(f"{ES_URL}/_bulk", data=body.encode(),
+        req = urllib.request.Request(f"{ES_URL}/movies/_bulk", data=body.encode(),
             headers={"Content-Type": "application/x-ndjson"}, method="POST")
         urllib.request.urlopen(req)
     cur.close()

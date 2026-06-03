@@ -28,9 +28,8 @@ public class YouTubeDNNRecallStrategy implements RecallStrategy {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Mono<List<RecallItem>> recall(Map<String, Object> userFeatures, int topK) {
-        List<Long> histMovieIds = (List<Long>) userFeatures.getOrDefault("histMovieIds", List.of());
+        List<Long> histMovieIds = RecallFeatureUtil.history(userFeatures);
         var request = new RecallRequest(userFeatures, histMovieIds, "");
         return rpcClient.generateUserVector(request)
             .map(resp -> {

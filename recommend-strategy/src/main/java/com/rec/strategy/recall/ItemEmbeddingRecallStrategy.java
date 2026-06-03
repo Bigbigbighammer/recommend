@@ -28,10 +28,9 @@ public class ItemEmbeddingRecallStrategy implements RecallStrategy {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Mono<List<RecallItem>> recall(Map<String, Object> userFeatures, int topK) {
         return Mono.<List<RecallItem>>fromCallable(() -> {
-            List<Long> histMovieIds = (List<Long>) userFeatures.getOrDefault("histMovieIds", List.of());
+            List<Long> histMovieIds = RecallFeatureUtil.history(userFeatures);
             if (histMovieIds.isEmpty()) {
                 return List.of();
             }

@@ -26,6 +26,9 @@ public class UserPreferenceRecallStrategy implements RecallStrategy {
     @Override
     public Mono<List<RecallItem>> recall(Map<String, Object> userFeatures, int topK) {
         List<String> genres = extractGenres(userFeatures.get("frequent_genres"));
+        if (genres.isEmpty()) {
+            genres = extractGenres(userFeatures.get("preferredGenres"));
+        }
         return esRepo.searchByGenres(genres, topK)
                 .map(r -> new RecallItem(r.movieId(), 0.8, getName()))
                 .collectList();
