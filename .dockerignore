@@ -4,3 +4,7 @@
 .git/
 docs/
 *.md
+scripts/data/
+data/
+__pycache__/
+*.pyc
