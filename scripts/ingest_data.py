@@ -97,6 +97,7 @@ def import_movies(conn, df):
             _int(row.get('isAdult')),
             _float(row.get('averageRating')),
             _int(row.get('numVotes')),
+            f"/posters/{int(row['movie_id'])}.png",
         ))
         count += 1
         if len(batch) >= BATCH:
@@ -109,14 +110,14 @@ def import_movies(conn, df):
 
 def _flush_movies(cur, batch):
     execute_values(cur, """INSERT INTO movies
-        (movie_id, imdb_id, title, year, genres, description, title_type, runtime_minutes, is_adult, imdb_rating, imdb_votes, avg_rating, rating_count)
+        (movie_id, imdb_id, title, year, genres, description, title_type, runtime_minutes, is_adult, imdb_rating, imdb_votes, poster_url, avg_rating, rating_count)
         VALUES %s ON CONFLICT (movie_id) DO UPDATE SET
         imdb_id=EXCLUDED.imdb_id, title=EXCLUDED.title, year=EXCLUDED.year,
         genres=EXCLUDED.genres, description=EXCLUDED.description,
         title_type=EXCLUDED.title_type, runtime_minutes=EXCLUDED.runtime_minutes,
         is_adult=EXCLUDED.is_adult, imdb_rating=EXCLUDED.imdb_rating,
-        imdb_votes=EXCLUDED.imdb_votes""",
-        batch, template="(%s,%s,%s,%s,%s::text[],%s,%s,%s,%s,%s,%s,0,0)")
+        imdb_votes=EXCLUDED.imdb_votes, poster_url=EXCLUDED.poster_url""",
+        batch, template="(%s,%s,%s,%s,%s::text[],%s,%s,%s,%s,%s,%s,%s,0,0)")
 
 
 def import_users(conn, df):
@@ -286,25 +287,26 @@ def import_genres(conn, df_movies):
 def copy_posters(data_dir):
     """Copy poster images from image folder to data/posters/"""
     import shutil
-    
+
     src_dir = Path(data_dir) / "image"
     dst_dir = Path("data") / "posters"
-    
+
     if not src_dir.exists():
         print(f"Image directory not found at {src_dir}, skipping posters")
         return
-    
+
     # Create destination directory
     dst_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Copy all PNG files
     poster_files = list(src_dir.glob("*.png"))
     print(f"Copying {len(poster_files)} poster images from {src_dir} to {dst_dir} ...")
-    
+
     for poster in poster_files:
         shutil.copy2(poster, dst_dir / poster.name)
-    
+
     print(f"Copied {len(poster_files)} posters")
+
 
 def create_test_user(conn):
     log("Creating test user ...")
