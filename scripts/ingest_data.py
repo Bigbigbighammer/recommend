@@ -285,17 +285,27 @@ def import_genres(conn, df_movies):
 
 
 def copy_posters(data_dir):
-    """Copy poster images from image/ directory to a location nginx can serve."""
-    src = data_dir / "image"
-    dst = Path(__file__).resolve().parent.parent / "data" / "posters"
-    dst.mkdir(parents=True, exist_ok=True)
-    count = 0
-    for img in src.glob("*.png"):
-        target = dst / img.name
-        if not target.exists():
-            target.write_bytes(img.read_bytes())
-        count += 1
-    log(f"Posters: {count} copied to {dst}")
+    """Copy poster images from image folder to data/posters/"""
+    import shutil
+
+    src_dir = Path(data_dir) / "image"
+    dst_dir = Path("data") / "posters"
+
+    if not src_dir.exists():
+        print(f"Image directory not found at {src_dir}, skipping posters")
+        return
+
+    # Create destination directory
+    dst_dir.mkdir(parents=True, exist_ok=True)
+
+    # Copy all PNG files
+    poster_files = list(src_dir.glob("*.png"))
+    print(f"Copying {len(poster_files)} poster images from {src_dir} to {dst_dir} ...")
+
+    for poster in poster_files:
+        shutil.copy2(poster, dst_dir / poster.name)
+
+    print(f"Copied {len(poster_files)} posters")
 
 
 def create_test_user(conn):

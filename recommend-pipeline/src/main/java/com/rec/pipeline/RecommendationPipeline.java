@@ -45,6 +45,6 @@ public class RecommendationPipeline {
                     .flatMap(c -> rankingStage.execute(c, RANK_TOP_K))
                     .flatMap(rerankingStage::execute);
             })
-            .timeout(Duration.ofMillis(800));
+            .timeout(Duration.ofMillis(5000));
     }
 }

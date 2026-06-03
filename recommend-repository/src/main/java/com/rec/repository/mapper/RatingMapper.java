@@ -5,6 +5,7 @@ import com.rec.repository.entity.RatingEntity;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface RatingMapper extends BaseMapper<RatingEntity> {
@@ -28,4 +29,9 @@ public interface RatingMapper extends BaseMapper<RatingEntity> {
 
     @Select("SELECT COUNT(*) FROM ratings WHERE movie_id = #{movieId}")
     int countByMovie(@Param("movieId") Long movieId);
+
+    @Select("SELECT COALESCE(AVG(rating), 0) AS avg_rating, COUNT(*) AS rating_count, " +
+            "COALESCE(MAX(timestamp), 0) AS max_ts, COALESCE(MIN(timestamp), 0) AS min_ts " +
+            "FROM ratings WHERE user_id = #{userId}")
+    Map<String, Object> selectStatsByUser(@Param("userId") Long userId);
 }

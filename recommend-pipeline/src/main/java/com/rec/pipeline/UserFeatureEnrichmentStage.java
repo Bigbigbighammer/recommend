@@ -1,5 +1,6 @@
 package com.rec.pipeline;
 
+import com.rec.repository.mapper.RatingMapper;
 import com.rec.repository.mapper.UserMapper;
 import com.rec.repository.redis.UserProfileRedisRepository;
 import org.springframework.stereotype.Component;
@@ -10,10 +11,13 @@ import java.util.*;
 public class UserFeatureEnrichmentStage {
     private final UserProfileRedisRepository redisRepo;
     private final UserMapper userMapper;
+    private final RatingMapper ratingMapper;
 
-    public UserFeatureEnrichmentStage(UserProfileRedisRepository redisRepo, UserMapper userMapper) {
+    public UserFeatureEnrichmentStage(UserProfileRedisRepository redisRepo, UserMapper userMapper,
+                                      RatingMapper ratingMapper) {
         this.redisRepo = redisRepo;
         this.userMapper = userMapper;
+        this.ratingMapper = ratingMapper;
     }
 
     public Mono<PipelineContext> execute(PipelineContext ctx) {
@@ -46,6 +50,26 @@ public class UserFeatureEnrichmentStage {
                         }
                     }
                 }
+                // Add user behavioural statistics for ranking model
+                Map<String, Object> userStats = ratingMapper.selectStatsByUser(userId);
+                if (userStats != null && !userStats.isEmpty()) {
+                    Number avgRating = (Number) userStats.get("avg_rating");
+                    Number ratingCount = (Number) userStats.get("rating_count");
+                    Number maxTs = (Number) userStats.get("max_ts");
+                    Number minTs = (Number) userStats.get("min_ts");
+
+                    if (avgRating != null) {
+                        enriched.put("userAvgRating", avgRating.doubleValue());
+                    }
+                    if (ratingCount != null) {
+                        enriched.put("userRatingCount", ratingCount.intValue());
+                    }
+                    if (maxTs != null && minTs != null) {
+                        long activeDays = (maxTs.longValue() - minTs.longValue()) / 86400;
+                        enriched.put("userActiveDays", (int) activeDays);
+                    }
+                }
+
                 PipelineContext enrichedCtx = ctx.withUserFeatures(enriched);
                 if (!history.isEmpty()) {
                     enrichedCtx = enrichedCtx.withHistMovieIds(history);

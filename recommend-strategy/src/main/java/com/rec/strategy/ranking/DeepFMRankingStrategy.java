@@ -41,6 +41,16 @@ public class DeepFMRankingStrategy implements RankingStrategy {
                     feat.put("movie_id", c.movieId());
                     feat.put("genres", feats != null ? feats.genre() : null);
                     feat.put("isAdult", feats != null ? feats.isAdult() : 0);
+                    feat.put("year", feats != null ? feats.year() : 0);
+                    feat.put("avgRating", feats != null ? feats.avgRating() : 0.0);
+                    feat.put("ratingCount", feats != null ? feats.ratingCount() : 0);
+                    // Cross feature: user_avg - movie_avg (rating deviation)
+                    Number userAvg = (Number) userFeatures.get("userAvgRating");
+                    double uAvg = userAvg != null ? userAvg.doubleValue() : 0.0;
+                    double mAvg = feats != null ? feats.avgRating() : 0.0;
+                    feat.put("ratingDeviation", uAvg - mAvg);
+                    feat.put("imdbRating", feats != null ? feats.imdbRating() : 0.0);
+                    feat.put("imdbVotes", feats != null ? feats.imdbVotes() : 0);
                     return feat;
                 })
                 .collect(Collectors.toList());

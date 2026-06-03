@@ -58,7 +58,11 @@ public class RankingStage {
                     m.getGenres() != null && m.getGenres().length > 0 ? m.getGenres()[0] : null,
                     m.getGenres() != null ? Arrays.asList(m.getGenres()) : List.of(),
                     m.getIsAdult() != null ? m.getIsAdult() : 0,
-                    m.getYear() != null ? m.getYear() : 0));
+                    m.getYear() != null ? m.getYear() : 0,
+                    m.getAvgRating() != null ? m.getAvgRating() : 0.0,
+                    m.getRatingCount() != null ? m.getRatingCount() : 0,
+                    m.getImdbRating() != null ? m.getImdbRating() : 0.0,
+                    m.getImdbVotes() != null ? m.getImdbVotes() : 0));
             }
         }
         return map;
