@@ -1,17 +1,28 @@
 package com.rec.pipeline;
 
 import com.rec.strategy.registry.RecallStrategyRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class RecallStage {
     private final RecallStrategyRegistry registry;
+    private final Map<String, Double> fusionWeights;
+    private final int rrfK;
 
-    public RecallStage(RecallStrategyRegistry registry) {
+    public RecallStage(
+            RecallStrategyRegistry registry,
+            @Value("${recommend.recall-fusion.weights:itemcf=2.0,usercf=1.8,ease=1.25,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.5,item_embedding=0.3,youtubednn=0.4,popular=0.05}") String weights,
+            @Value("${recommend.recall-fusion.rrf-k:60}") int rrfK) {
         this.registry = registry;
+        this.fusionWeights = parseWeights(weights);
+        this.rrfK = rrfK;
     }
 
     public Mono<PipelineContext> execute(PipelineContext ctx, int topK) {
@@ -19,7 +30,21 @@ public class RecallStage {
             .flatMap(strategy -> strategy.recall(ctx.userFeatures(), topK)
                 .onErrorResume(e -> Mono.just(List.of())))
             .collectList()
-            .map(results -> SnakeMergeUtil.snakeMerge(results, topK))
+            .map(results -> SnakeMergeUtil.weightedRrfMerge(results, fusionWeights, topK, rrfK))
             .map(ctx::withRecallCandidates);
+    }
+
+    private static Map<String, Double> parseWeights(String weights) {
+        if (weights == null || weights.isBlank()) {
+            return Map.of();
+        }
+        return Arrays.stream(weights.split(","))
+            .map(String::trim)
+            .filter(v -> !v.isEmpty() && v.contains("="))
+            .map(v -> v.split("=", 2))
+            .collect(Collectors.toMap(
+                pair -> pair[0].trim(),
+                pair -> Double.parseDouble(pair[1].trim()),
+                (left, right) -> right));
     }
 }

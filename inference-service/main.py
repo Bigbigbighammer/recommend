@@ -1,6 +1,7 @@
 import os
 import random
 import logging
+import json
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,9 @@ from pydantic import BaseModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+import numpy as np
+
 
 app = FastAPI(title="Rec Model Inference Service", version="1.0.0")
 
@@ -70,6 +74,113 @@ class ModelVersion(BaseModel):
     deploy_time: str
 
 
+# ===== YouTubeDNN recall tower =====
+
+class YouTubeDNNModel:
+    def __init__(self) -> None:
+        data_dir = Path(os.environ.get("YOUTUBE_DNN_DATA_DIR", "/app/data"))
+        self.item_emb_path = Path(os.environ.get("YOUTUBE_DNN_ITEM_EMB_PATH", data_dir / "item_emb.npy"))
+        self.movie_ids_path = Path(os.environ.get("YOUTUBE_DNN_MOVIE_IDS_PATH", data_dir / "movie_ids.npy"))
+        self.user_item_emb_path = Path(os.environ.get("YOUTUBE_DNN_USER_ITEM_EMB_PATH", data_dir / "youtube_user_item_emb.npy"))
+        self.meta_path = Path(os.environ.get("YOUTUBE_DNN_META_PATH", data_dir / "youtubednn_meta.json"))
+        self.history_window = int(os.environ.get("YOUTUBE_DNN_HISTORY_WINDOW", "20"))
+        self.version = "unavailable"
+        self.item_emb: np.ndarray | None = None
+        self.user_item_emb: np.ndarray | None = None
+        self.movie_to_idx: dict[int, int] = {}
+        self.default_vector: np.ndarray | None = None
+        self.load()
+
+    def load(self) -> None:
+        try:
+            if not self.item_emb_path.exists() or not self.movie_ids_path.exists():
+                print("YouTubeDNN artifacts not found; recall endpoint will use deterministic fallback.", flush=True)
+                return
+
+            item_emb = np.load(self.item_emb_path).astype(np.float64)
+            movie_ids = np.load(self.movie_ids_path).astype(np.int64)
+            if self.user_item_emb_path.exists():
+                user_item_emb = np.load(self.user_item_emb_path).astype(np.float64)
+            else:
+                user_item_emb = item_emb.copy()
+
+            if len(item_emb) != len(movie_ids) or len(user_item_emb) != len(movie_ids):
+                raise ValueError("embedding/movie id count mismatch")
+
+            self.item_emb = normalize_rows(item_emb)
+            self.user_item_emb = normalize_rows(user_item_emb)
+            self.movie_to_idx = {int(movie_id): idx for idx, movie_id in enumerate(movie_ids.tolist())}
+            self.default_vector = normalize_vector(self.user_item_emb.mean(axis=0))
+
+            if self.meta_path.exists():
+                with self.meta_path.open("r", encoding="utf-8") as f:
+                    meta = json.load(f)
+                self.version = str(meta.get("version", "youtube-numpy-v1"))
+            else:
+                self.version = "youtube-numpy-v1"
+
+            print(
+                f"Loaded YouTubeDNN artifacts: items={len(movie_ids)}, "
+                f"dim={self.item_emb.shape[1]}, version={self.version}",
+                flush=True,
+            )
+        except Exception as exc:
+            print(f"Failed to load YouTubeDNN artifacts: {exc}", flush=True)
+            self.item_emb = None
+            self.user_item_emb = None
+            self.movie_to_idx = {}
+            self.default_vector = None
+            self.version = "unavailable"
+
+    def is_loaded(self) -> bool:
+        return self.user_item_emb is not None and bool(self.movie_to_idx)
+
+    def user_vector(self, hist_movie_ids: list[int]) -> list[float]:
+        if not self.is_loaded():
+            return deterministic_fallback_vector(hist_movie_ids, 16)
+
+        assert self.user_item_emb is not None
+        hist_idx = [
+            self.movie_to_idx[int(movie_id)]
+            for movie_id in hist_movie_ids[: self.history_window]
+            if int(movie_id) in self.movie_to_idx
+        ]
+
+        if hist_idx:
+            weights = np.linspace(1.0, 0.6, num=len(hist_idx), dtype=np.float64)
+            vec = np.average(self.user_item_emb[hist_idx], axis=0, weights=weights)
+            vec = normalize_vector(vec)
+        else:
+            vec = self.default_vector
+
+        if vec is None:
+            return deterministic_fallback_vector(hist_movie_ids, self.user_item_emb.shape[1])
+        return [float(round(v, 8)) for v in vec.tolist()]
+
+
+def normalize_rows(matrix: np.ndarray) -> np.ndarray:
+    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    return matrix / np.where(norms == 0.0, 1.0, norms)
+
+
+def normalize_vector(vector: np.ndarray) -> np.ndarray:
+    norm = float(np.linalg.norm(vector))
+    if norm == 0.0:
+        return vector
+    return vector / norm
+
+
+def deterministic_fallback_vector(hist_movie_ids: list[int], dim: int) -> list[float]:
+    seed = sum(int(v) * 131 for v in hist_movie_ids[-20:]) or 2026
+    rng = random.Random(seed)
+    values = [rng.uniform(-1.0, 1.0) for _ in range(dim)]
+    norm = sum(v * v for v in values) ** 0.5 or 1.0
+    return [round(v / norm, 8) for v in values]
+
+
+youtube_model = YouTubeDNNModel()
+
+
 # ===== Endpoints =====
 
 @app.post("/api/predict/ranking", response_model=list[CTRPrediction])
@@ -100,22 +211,26 @@ def predict_ctr(request: RankingRequest):
 
 @app.post("/api/predict/recall", response_model=UserVectorResponse)
 def generate_user_vector(request: RecallRequest):
-    """YouTubeDNN user embedding —— mock 实现"""
+    """YouTubeDNN user embedding generated from trained recall artifacts."""
     return UserVectorResponse(
-        user_vector=[round(random.uniform(-1.0, 1.0), 4) for _ in range(16)],
-        version="v1",
+        user_vector=youtube_model.user_vector(request.hist_movie_ids),
+        version=youtube_model.version,
     )
 
 
 @app.get("/api/health")
 def health():
-    return {"status": "healthy", "model_version": "v1"}
+    return {
+        "status": "healthy",
+        "model_version": youtube_model.version,
+        "recall_model_loaded": youtube_model.is_loaded(),
+    }
 
 
 @app.get("/api/version/{model_type}", response_model=ModelVersion)
 def get_version(model_type: str):
     return ModelVersion(
         model_type=model_type,
-        version="v1",
+        version=youtube_model.version if model_type == "recall" else "v1",
         deploy_time="2026-05-30T12:00:00",
     )
