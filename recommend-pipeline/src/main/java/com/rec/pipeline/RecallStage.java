@@ -18,7 +18,7 @@ public class RecallStage {
 
     public RecallStage(
             RecallStrategyRegistry registry,
-            @Value("${recommend.recall-fusion.weights:itemcf=2.0,usercf=1.8,ease=1.25,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.5,item_embedding=0.3,youtubednn=0.4,popular=0.05}") String weights,
+            @Value("${recommend.recall-fusion.weights:itemcf=1.5,usercf=1.0,ease=1.0,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.2,item_embedding=0.2,youtubednn=6.0,popular=0.02}") String weights,
             @Value("${recommend.recall-fusion.rrf-k:60}") int rrfK) {
         this.registry = registry;
         this.fusionWeights = parseWeights(weights);

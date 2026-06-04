@@ -6,6 +6,7 @@ RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 COPY inference-service/main.py .
 COPY inference-service/model_ranking.py .
+COPY inference-service/model_youtube_dnn.py .
 COPY inference-service/model_weights/ ./model_weights/
 EXPOSE 8081
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8081"]

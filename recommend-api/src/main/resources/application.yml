@@ -55,7 +55,7 @@ recommend:
       max-retries: 1
 
   recall-fusion:
-    weights: ${RECOMMEND_RECALL_FUSION_WEIGHTS:itemcf=2.0,usercf=1.8,ease=1.25,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.5,item_embedding=0.3,youtubednn=0.4,popular=0.05}
+    weights: ${RECOMMEND_RECALL_FUSION_WEIGHTS:itemcf=1.5,usercf=1.0,ease=1.0,seqcf=1.1,bpr=0.0,swing=0.7,user_preference=0.2,item_embedding=0.2,youtubednn=6.0,popular=0.02}
     rrf-k: 60
 
   recall-artifacts:
