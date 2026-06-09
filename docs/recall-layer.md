@@ -100,15 +100,16 @@ rating >= 8.0
 | 原混合召回 | 0.4015 | 0.0591 | 0.2205 | 0.9438 | 1609 |
 | 加 SeqCF 后 | 0.4233 | 0.0614 | 0.2349 | 0.9559 | 1883 |
 | 单独 EASE | 0.4231 | 0.0606 | 0.2379 | 0.9599 | 1473 |
-| 最终 Hybrid Recall | 0.4286 | 0.0620 | 0.2388 | 0.9586 | 1733 |
+| 加 EASE 后 Hybrid Recall | 0.4286 | 0.0620 | 0.2388 | 0.9586 | 1733 |
+| 加 PyTorch YouTubeDNN 后 Hybrid Recall | 0.4687 | 0.0660 | 0.2725 | 0.9645 | 2243 |
 
 最终主要提升来自：
 
 ```text
-EASE + SeqCF + ItemCF + UserCF 的多路召回融合
+PyTorch YouTubeDNN + EASE + SeqCF + ItemCF + UserCF 的多路召回融合
 ```
 
-YouTubeDNN 已经训练并接入，但当前离线单路效果低于 EASE / SeqCF，因此在融合中只作为辅助召回。
+YouTubeDNN 已升级为 PyTorch 双塔版本。16 epoch 离线模型的单路 Recall@100 达到 0.4344，加入混合召回后最佳 Recall@100 达到 0.4687。
 
 ## 3. 如何复现实验
 
@@ -168,7 +169,7 @@ data/ 是运行时产物目录，不建议提交到 GitHub。
 
 ## 5. YouTubeDNN 训练与接入
 
-YouTubeDNN 训练脚本：
+旧版轻量 YouTubeDNN 训练脚本：
 
 ```text
 scripts/train_youtubednn.py
@@ -189,7 +190,52 @@ data/youtube_user_item_emb.npy
 data/youtubednn_meta.json
 ```
 
-Python 推理服务会读取这些文件，生成用户向量；Java 的 `YouTubeDNNRecallStrategy` 再基于物品向量做近邻召回。
+新版完整 PyTorch YouTubeDNN 训练脚本：
+
+```text
+scripts/train_youtubednn_torch.py
+```
+
+离线评测与最终线上模型训练命令：
+
+```powershell
+python scripts\train_youtubednn_torch.py --data-dir "D:\BDhomework\recommend-master\scripts\data\funrec-movielens-1m" --epochs 16 --dim 64 --hidden-dim 128 --max-samples 500000 --batch-size 512 --eval-output test-results\youtubednn_torch_online_e16_eval.csv --out-dir data\youtubednn_torch_online_e16
+```
+
+该命令会先用时间切分做离线评测，然后用全部正样本训练最终线上模型。
+
+最终线上产物需要放在 `data/` 根目录：
+
+```text
+data/youtube_dnn_torch.pt
+data/item_emb.npy
+data/movie_ids.npy
+data/youtubednn_torch_meta.json
+```
+
+当前 Python 推理服务会优先加载：
+
+```text
+data/youtube_dnn_torch.pt
+```
+
+如果该文件存在，`/api/predict/recall` 会使用 PyTorch user tower 生成用户向量；如果不存在，才回退到旧的 NumPy pooling 版本。
+
+Java 的 `YouTubeDNNRecallStrategy` 仍然调用 Python `/api/predict/recall` 获取 user vector，再用 `ItemEmbeddingStore` 读取 `data/item_emb.npy` 做 topK 向量召回。
+
+PyTorch YouTubeDNN 混合召回测试脚本：
+
+```text
+scripts/eval_hybrid_youtubednn_torch.py
+```
+
+最佳离线融合结果：
+
+| 方法 | Recall@100 | Precision@100 | NDCG@100 |
+|---|---:|---:|---:|
+| 不加 PyTorch YouTubeDNN 的混合召回 | 0.4312 | 0.0624 | 0.2410 |
+| 单独 PyTorch YouTubeDNN | 0.4344 | 0.0605 | 0.2396 |
+| 加入 PyTorch YouTubeDNN 的混合召回 | 0.4687 | 0.0660 | 0.2725 |
 
 ## 6. 如何启动并验证在线接入
 
@@ -333,5 +379,5 @@ YouTubeDNN 召回辅助接入
 可以这样描述本次工作：
 
 ```text
-我完成了推荐系统召回层的离线实验与在线接入。离线部分实现了 Popular、ItemCF、SeqCF、EASE、Swing、UserCF、Content、Genre、YouTubeDNN 等召回方法，并用 Recall、Precision、NDCG、HitRate、Coverage 进行评测。在线部分将 ItemCF、SeqCF、EASE、Swing、UserCF、Popular、UserPreference、YouTubeDNN 接入 Java RecallStrategy，并通过加权 RRF 进行多路融合。最终同口径离线 Recall@100 从 0.4015 提升到 0.4286，NDCG@100 从 0.2205 提升到 0.2388。
+我完成了推荐系统召回层的离线实验与在线接入。离线部分实现了 Popular、ItemCF、SeqCF、EASE、Swing、UserCF、Content、Genre、PyTorch YouTubeDNN 等召回方法，并用 Recall、Precision、NDCG、HitRate、Coverage 进行评测。在线部分将 ItemCF、SeqCF、EASE、Swing、UserCF、Popular、UserPreference、PyTorch YouTubeDNN 接入 Java RecallStrategy，并通过加权 RRF 进行多路融合。最终同口径离线 Recall@100 从 0.4015 提升到 0.4687，NDCG@100 从 0.2205 提升到 0.2725。
 ```

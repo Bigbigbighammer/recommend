@@ -50,7 +50,7 @@ services:
       - "8081:8081"
     environment:
       YOUTUBE_DNN_DATA_DIR: /app/data
-      YOUTUBE_DNN_HISTORY_WINDOW: 20
+      YOUTUBE_DNN_HISTORY_WINDOW: 30
     volumes:
       - ./data:/app/data
     healthcheck:

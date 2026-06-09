@@ -79,12 +79,14 @@ class ModelVersion(BaseModel):
 class YouTubeDNNModel:
     def __init__(self) -> None:
         data_dir = Path(os.environ.get("YOUTUBE_DNN_DATA_DIR", "/app/data"))
+        self.torch_model_path = Path(os.environ.get("YOUTUBE_DNN_TORCH_MODEL_PATH", data_dir / "youtube_dnn_torch.pt"))
         self.item_emb_path = Path(os.environ.get("YOUTUBE_DNN_ITEM_EMB_PATH", data_dir / "item_emb.npy"))
         self.movie_ids_path = Path(os.environ.get("YOUTUBE_DNN_MOVIE_IDS_PATH", data_dir / "movie_ids.npy"))
         self.user_item_emb_path = Path(os.environ.get("YOUTUBE_DNN_USER_ITEM_EMB_PATH", data_dir / "youtube_user_item_emb.npy"))
         self.meta_path = Path(os.environ.get("YOUTUBE_DNN_META_PATH", data_dir / "youtubednn_meta.json"))
         self.history_window = int(os.environ.get("YOUTUBE_DNN_HISTORY_WINDOW", "20"))
         self.version = "unavailable"
+        self.torch_predictor = None
         self.item_emb: np.ndarray | None = None
         self.user_item_emb: np.ndarray | None = None
         self.movie_to_idx: dict[int, int] = {}
@@ -93,8 +95,22 @@ class YouTubeDNNModel:
 
     def load(self) -> None:
         try:
+            if self.torch_model_path.exists():
+                from model_youtube_dnn import TorchYouTubeDNNPredictor
+                self.torch_predictor = TorchYouTubeDNNPredictor(self.torch_model_path)
+                self.history_window = self.torch_predictor.history_window
+                self.version = "youtube-torch-v1"
+                logger.info(
+                    "Loaded PyTorch YouTubeDNN model: items=%s users=%s dim=%s path=%s",
+                    len(self.torch_predictor.movie_ids),
+                    len(self.torch_predictor.user_ids),
+                    self.torch_predictor.dim,
+                    self.torch_model_path,
+                )
+                return
+
             if not self.item_emb_path.exists() or not self.movie_ids_path.exists():
-                print("YouTubeDNN artifacts not found; recall endpoint will use deterministic fallback.", flush=True)
+                logger.warning("YouTubeDNN artifacts not found; recall endpoint will use deterministic fallback.")
                 return
 
             item_emb = np.load(self.item_emb_path).astype(np.float64)
@@ -119,13 +135,15 @@ class YouTubeDNNModel:
             else:
                 self.version = "youtube-numpy-v1"
 
-            print(
-                f"Loaded YouTubeDNN artifacts: items={len(movie_ids)}, "
-                f"dim={self.item_emb.shape[1]}, version={self.version}",
-                flush=True,
+            logger.info(
+                "Loaded NumPy YouTubeDNN artifacts: items=%s dim=%s version=%s",
+                len(movie_ids),
+                self.item_emb.shape[1],
+                self.version,
             )
         except Exception as exc:
-            print(f"Failed to load YouTubeDNN artifacts: {exc}", flush=True)
+            logger.exception("Failed to load YouTubeDNN artifacts: %s", exc)
+            self.torch_predictor = None
             self.item_emb = None
             self.user_item_emb = None
             self.movie_to_idx = {}
@@ -133,9 +151,12 @@ class YouTubeDNNModel:
             self.version = "unavailable"
 
     def is_loaded(self) -> bool:
-        return self.user_item_emb is not None and bool(self.movie_to_idx)
+        return self.torch_predictor is not None or (self.user_item_emb is not None and bool(self.movie_to_idx))
 
-    def user_vector(self, hist_movie_ids: list[int]) -> list[float]:
+    def user_vector(self, user_features: dict[str, Any], hist_movie_ids: list[int]) -> list[float]:
+        if self.torch_predictor is not None:
+            return self.torch_predictor.user_vector(user_features, hist_movie_ids)
+
         if not self.is_loaded():
             return deterministic_fallback_vector(hist_movie_ids, 16)
 
@@ -213,7 +234,7 @@ def predict_ctr(request: RankingRequest):
 def generate_user_vector(request: RecallRequest):
     """YouTubeDNN user embedding generated from trained recall artifacts."""
     return UserVectorResponse(
-        user_vector=youtube_model.user_vector(request.hist_movie_ids),
+        user_vector=youtube_model.user_vector(request.user_features, request.hist_movie_ids),
         version=youtube_model.version,
     )
 
@@ -224,6 +245,7 @@ def health():
         "status": "healthy",
         "model_version": youtube_model.version,
         "recall_model_loaded": youtube_model.is_loaded(),
+        "recall_model_type": "torch" if youtube_model.torch_predictor is not None else "numpy_or_fallback",
     }
 
 
