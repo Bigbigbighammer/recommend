@@ -29,7 +29,13 @@ public class UserPreferenceRecallStrategy implements RecallStrategy {
         if (genres.isEmpty()) {
             genres = extractGenres(userFeatures.get("preferredGenres"));
         }
-        return esRepo.searchByGenres(genres, topK)
+        return esRepo.searchByGenres(genres, topK * 2)
+                .filter(r -> {
+                    @SuppressWarnings("unchecked")
+                    List<Long> hist = (List<Long>) userFeatures.getOrDefault("histMovieIds", List.of());
+                    return !hist.contains(r.movieId());
+                })
+                .take(topK)
                 .map(r -> new RecallItem(r.movieId(), 0.8, getName()))
                 .collectList();
     }

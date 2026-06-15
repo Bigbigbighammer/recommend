@@ -30,7 +30,7 @@ public class UserHandler {
         var user = userMapper.findActiveById(userId);
         if (user == null) return ServerResponse.notFound().build();
 
-        List<RatingResponse> recentRatings = ratingMapper.findRecentByUser(userId, 10)
+        List<RatingResponse> recentRatings = ratingMapper.findAllByUser(userId)
             .stream().map(r -> new RatingResponse(r.getUserId(), r.getMovieId(), r.getTitle(), r.getRating(), r.getTimestamp()))
             .collect(Collectors.toList());
 

@@ -8,7 +8,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Component
 @ConditionalOnProperty(name = "recommend.strategy.recall.item-embedding.enabled", havingValue = "true", matchIfMissing = true)
@@ -35,10 +40,25 @@ public class ItemEmbeddingRecallStrategy implements RecallStrategy {
                 return List.of();
             }
 
-            Long queryMovieId = histMovieIds.get(histMovieIds.size() - 1);
-
             Set<Long> seen = new HashSet<>(histMovieIds);
-            return embeddingStore.findSimilarItems(queryMovieId, topK, seen, getName());
+            int seedCount = Math.min(3, histMovieIds.size());
+            Map<Long, RecallItem> merged = new LinkedHashMap<>();
+            double decay = 1.0;
+            for (int s = 0; s < seedCount; s++) {
+                Long seedMovieId = histMovieIds.get(histMovieIds.size() - 1 - s);
+                List<RecallItem> neighbors = embeddingStore.findSimilarItems(seedMovieId, topK, seen, getName());
+                for (RecallItem item : neighbors) {
+                    merged.merge(item.movieId(),
+                        new RecallItem(item.movieId(), item.score() * decay, getName()),
+                        (a, b) -> new RecallItem(a.movieId(), a.score() + b.score(), getName()));
+                }
+                decay *= 0.6;
+            }
+
+            return merged.values().stream()
+                .sorted(Comparator.comparingDouble(RecallItem::score).reversed())
+                .limit(topK)
+                .toList();
         }).onErrorResume(e -> {
             log.error("ItemEmbedding recall failed: {}", e.getMessage());
             return Mono.just(List.of());

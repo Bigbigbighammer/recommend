@@ -51,7 +51,7 @@ public class SeqCFRecallStrategy implements RecallStrategy {
 
             Set<Long> seen = new HashSet<>(histMovieIds);
             Map<Long, Double> scores = new HashMap<>();
-            int start = Math.max(0, histMovieIds.size() - 30);
+            int start = Math.max(0, histMovieIds.size() - 50);
             int rank = 0;
             for (int i = histMovieIds.size() - 1; i >= start; i--) {
                 Long movieId = histMovieIds.get(i);

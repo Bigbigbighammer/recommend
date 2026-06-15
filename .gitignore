@@ -36,7 +36,10 @@ frontend/playwright-report/
 frontend/test-results/
 
 # Data files (too large)
-data/
+data/*
+!data/youtubednn_item_emb.npy
+!data/youtubednn_movie_ids.npy
+!data/posters/
 scripts/data/*.zip
 scripts/data/*.gz
 scripts/data/*.pkl
