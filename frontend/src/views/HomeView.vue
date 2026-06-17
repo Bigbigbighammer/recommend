@@ -6,6 +6,11 @@
           <span class="gold">next favorite</span>
         </h1>
         <p class="sub">Personalized picks from our collection</p>
+        <nav class="top-nav">
+          <router-link to="/search">Search</router-link>
+          <router-link to="/genre">Browse by Genre</router-link>
+          <router-link to="/profile">Profile</router-link>
+        </nav>
       </div>
     </div>
 
@@ -113,6 +118,9 @@ onMounted(async () => {
   background: linear-gradient(180deg, rgba(200,164,92,.04) 0%, transparent 100%);
 }
 .hero h1 { font-size: 3.5rem; line-height: 1.15; max-width: 700px; }
+.top-nav { display: flex; gap: 1.5rem; margin-top: 1.2rem; }
+.top-nav a { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; text-decoration: none; transition: color .15s; }
+.top-nav a:hover { color: var(--gold); }
 .gold { color: var(--gold); font-style: italic; }
 .sub { margin-top: .8rem; font-size: .8rem; color: var(--text-muted); letter-spacing: .04em; text-transform: uppercase; }
 .section { margin-top: 3rem; }

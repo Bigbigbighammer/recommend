@@ -69,6 +69,35 @@ public class MovieHandler {
         return ServerResponse.ok().bodyValue(new MovieListResponse(items, (int) total, page, size, hasNext));
     }
 
+    public Mono<ServerResponse> byGenre(ServerRequest request) {
+        String genre = request.pathVariable("genre");
+        int page = Math.max(1, Integer.parseInt(request.queryParam("page").orElse("1")));
+        int size = Math.min(Integer.parseInt(request.queryParam("size").orElse("20")), 100);
+        Double minRating = request.queryParam("minRating").map(Double::parseDouble).orElse(null);
+        Integer yearFrom = request.queryParam("yearFrom").map(Integer::parseInt).orElse(null);
+        Integer yearTo = request.queryParam("yearTo").map(Integer::parseInt).orElse(null);
+        String sort = request.queryParam("sort").orElse("year");
+        String dir = request.queryParam("dir").orElse("desc");
+        String sortColumn = switch (sort) {
+            case "rating" -> "avg_rating";
+            case "title" -> "title";
+            default -> "year";
+        };
+        String sortDir = "asc".equalsIgnoreCase(dir) ? "ASC" : "DESC";
+        int offset = (page - 1) * size;
+
+        var movies = movieMapper.findByGenrePaged(genre, minRating, yearFrom, yearTo, sortColumn, sortDir, offset, size);
+        long total = movieMapper.countByGenreFiltered(genre, minRating, yearFrom, yearTo);
+        boolean hasNext = (long) page * size < total;
+
+        var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),
+            m.getGenres() != null
+                ? Arrays.stream(m.getGenres()).map(GenreHandler::normalize).toList()
+                : List.of(),
+            m.getAvgRating(), m.getImdbRating(), m.getPosterUrl())).collect(Collectors.toList());
+        return ServerResponse.ok().bodyValue(new MovieListResponse(items, (int) total, page, size, hasNext));
+    }
+
     public Mono<ServerResponse> popular(ServerRequest request) {
         var movies = movieMapper.findPopular(20);
         var items = movies.stream().map(m -> new MovieListItem(m.getMovieId(), m.getTitle(), m.getYear(),

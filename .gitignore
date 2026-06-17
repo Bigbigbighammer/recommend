@@ -39,7 +39,6 @@ frontend/test-results/
 data/*
 !data/youtubednn_item_emb.npy
 !data/youtubednn_movie_ids.npy
-!data/posters/
 scripts/data/*.zip
 scripts/data/*.gz
 scripts/data/*.pkl

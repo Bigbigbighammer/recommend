@@ -5,6 +5,7 @@ const routes = [
   { path: '/', name: 'Home', component: () => import('../views/HomeView.vue') },
   { path: '/movie/:id', name: 'MovieDetail', component: () => import('../views/MovieDetailView.vue') },
   { path: '/search', name: 'Search', component: () => import('../views/SearchView.vue') },
+  { path: '/genre', name: 'Genre', component: () => import('../views/GenreView.vue') },
   { path: '/profile', name: 'Profile', component: () => import('../views/ProfileView.vue') },
 ]
 
