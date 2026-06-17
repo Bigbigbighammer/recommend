@@ -36,9 +36,9 @@
           <input v-model="params.yearTo" type="number" min="1900" max="2030" placeholder="To yr" @change="applyFilters" />
           <span class="page-size">
             Show <select v-model="params.size" @change="applyFilters">
-              <option :value="20">20</option>
-              <option :value="40">40</option>
-              <option :value="60">60</option>
+              <option :value="18">18</option>
+              <option :value="36">36</option>
+              <option :value="54">54</option>
             </select>
           </span>
         </div>
@@ -78,7 +78,7 @@ const searched = ref(false)
 const params = reactive({
   genre: '',
   page: 1,
-  size: 20,
+  size: 18,
   sort: 'year',
   minRating: '',
   yearFrom: '',
@@ -91,7 +91,7 @@ function fromQuery() {
   return {
     genre: route.query.genre || '',
     page: Math.max(1, parseInt(route.query.page) || 1),
-    size: Math.min(100, Math.max(1, parseInt(route.query.size) || 20)),
+    size: Math.min(100, Math.max(1, parseInt(route.query.size) || 18)),
     sort: route.query.sort || 'year',
     minRating: route.query.minRating || '',
     yearFrom: route.query.yearFrom || '',
