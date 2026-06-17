@@ -47,6 +47,32 @@ public interface MovieMapper extends BaseMapper<MovieEntity> {
     @Select("SELECT * FROM movies ORDER BY movie_id ASC LIMIT #{limit} OFFSET #{offset}")
     List<MovieEntity> findPage(@Param("offset") int offset, @Param("limit") int limit);
 
+    @Select("<script>" +
+            "SELECT * FROM movies WHERE 1=1 " +
+            "<if test='minRating != null'>AND avg_rating &gt;= #{minRating}</if> " +
+            "<if test='yearFrom != null'>AND year &gt;= #{yearFrom}</if> " +
+            "<if test='yearTo != null'>AND year &lt;= #{yearTo}</if> " +
+            "ORDER BY ${sortColumn} ${sortDir} " +
+            "LIMIT #{limit} OFFSET #{offset}" +
+            "</script>")
+    List<MovieEntity> findAllFiltered(@Param("minRating") Double minRating,
+                                      @Param("yearFrom") Integer yearFrom,
+                                      @Param("yearTo") Integer yearTo,
+                                      @Param("sortColumn") String sortColumn,
+                                      @Param("sortDir") String sortDir,
+                                      @Param("offset") int offset,
+                                      @Param("limit") int limit);
+
+    @Select("<script>" +
+            "SELECT COUNT(*) FROM movies WHERE 1=1 " +
+            "<if test='minRating != null'>AND avg_rating &gt;= #{minRating}</if> " +
+            "<if test='yearFrom != null'>AND year &gt;= #{yearFrom}</if> " +
+            "<if test='yearTo != null'>AND year &lt;= #{yearTo}</if> " +
+            "</script>")
+    long countAllFiltered(@Param("minRating") Double minRating,
+                          @Param("yearFrom") Integer yearFrom,
+                          @Param("yearTo") Integer yearTo);
+
     @Select("SELECT COUNT(*) FROM movies")
     long countAll();
 }

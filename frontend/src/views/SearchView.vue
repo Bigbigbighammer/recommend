@@ -106,10 +106,12 @@ onMounted(async () => {
   } catch { genres.value = [] }
   Object.assign(params, fromQuery())
   query.value = route.query.q || ''
-  if (params.genre) {
-    loadMovies()
-  } else if (query.value) {
+  if (query.value) {
     doSearch()
+  } else if (params.genre) {
+    loadMovies()
+  } else {
+    loadAllMovies()
   }
 })
 
@@ -118,7 +120,6 @@ function syncURL() {
   if (params.genre) q.genre = params.genre
   if (query.value) q.q = query.value
   if (params.page > 1) q.page = params.page
-  if (params.size !== 20) q.size = params.size
   if (params.sort !== 'year') q.sort = params.sort
   if (params.minRating) q.minRating = params.minRating
   if (params.yearFrom) q.yearFrom = params.yearFrom
@@ -130,7 +131,7 @@ function selectGenre(g) {
   query.value = ''
   searched.value = false
   params.genre = g
-  if (!g) { movies.value = []; total.value = 0; syncURL(); return }
+  if (!g) { params.genre = ''; applyFilters(); return }
   applyFilters()
 }
 
@@ -150,7 +151,21 @@ function applyFilters() {
   params.page = 1
   query.value = ''
   syncURL()
-  loadMovies()
+  params.genre ? loadMovies() : loadAllMovies()
+}
+
+async function loadAllMovies() {
+  loading.value = true
+  try {
+    const q = [`page=${params.page}`, `page_size=${params.size}`, `sort=${params.sort}`]
+    if (params.minRating) q.push(`minRating=${params.minRating}`)
+    if (params.yearFrom) q.push(`yearFrom=${params.yearFrom}`)
+    if (params.yearTo) q.push(`yearTo=${params.yearTo}`)
+    const data = await fetch(`/api/movies?${q.join('&')}`).then(r => r.json())
+    movies.value = data.items || []
+    total.value = data.total || 0
+  } catch { movies.value = []; total.value = 0 }
+  finally { loading.value = false }
 }
 
 function goPage(p) {
