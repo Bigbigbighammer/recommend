@@ -7,6 +7,7 @@ import com.rec.strategy.registry.RankingStrategyRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 public class RankingStage {
     private final RankingStrategyRegistry registry;
     private final MovieMapper movieMapper;
+    private final SecureRandom rng = new SecureRandom();
 
     public RankingStage(RankingStrategyRegistry registry, MovieMapper movieMapper) {
         this.registry = registry;
@@ -44,7 +46,16 @@ public class RankingStage {
                     .map(c -> new RankedItem(c.movieId(), c.score(), c.score(), c.recallType(), List.of(), 0))
                     .toList());
             })
-            .map(items -> items.stream().limit(topK).toList())
+            .map(items -> items.stream()
+                .map(item -> new RankedItem(
+                    item.movieId(),
+                    item.score() + rng.nextDouble() * 0.04 - 0.02,
+                    item.recallScore(),
+                    item.recallType(),
+                    item.genres(),
+                    item.year()))
+                .sorted(Comparator.comparingDouble(RankedItem::score).reversed())
+                .limit(topK).toList())
             .map(ctx::withRankedItems)
             .map(c -> c.withItemFeatures(itemFeaturesMap));
     }
