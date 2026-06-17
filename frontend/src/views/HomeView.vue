@@ -7,8 +7,7 @@
         </h1>
         <p class="sub">Personalized picks from our collection</p>
         <nav class="top-nav">
-          <router-link to="/search">Search</router-link>
-          <router-link to="/genre">Browse by Genre</router-link>
+          <router-link to="/search">Discover</router-link>
           <router-link to="/profile">Profile</router-link>
         </nav>
       </div>
