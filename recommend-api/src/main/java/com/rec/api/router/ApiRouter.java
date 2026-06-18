@@ -39,6 +39,7 @@ public class ApiRouter {
             .POST("/api/movies", movieHandler::create)
             .GET("/api/movies", movieHandler::list)
             .GET("/api/movies/popular", movieHandler::popular)
+            .GET("/api/movies/genre/{genre}", movieHandler::byGenre)
             .GET("/api/movies/{id}", movieHandler::detail)
             .GET("/api/movies/{id}/cast", movieHandler::cast)
             .GET("/api/movies/{id}/crew", movieHandler::crew)

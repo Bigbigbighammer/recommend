@@ -53,6 +53,7 @@ export const api = {
 
   // Other
   getGenres: () => request('/genres'),
+  getMoviesByGenre: (genre) => request(`/movies/genre/${encodeURIComponent(genre)}`),
   getPerson: (id) => request(`/people/${id}`),
   getStats: () => request('/stats'),
   health: () => request('/health'),

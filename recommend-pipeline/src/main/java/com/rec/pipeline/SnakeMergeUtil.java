@@ -54,15 +54,21 @@ public final class SnakeMergeUtil {
             int rrfK) {
         if (resultsList.isEmpty()) return List.of();
 
+        double maxWeight = weights.values().stream().mapToDouble(Double::doubleValue).max().orElse(1.0);
+
         Map<Long, Double> scores = new HashMap<>();
         Map<Long, String> recallTypes = new HashMap<>();
         for (List<RecallItem> list : resultsList) {
-            for (int rank = 0; rank < list.size(); rank++) {
+            if (list.isEmpty()) continue;
+            String strategy = list.get(0).recallType();
+            double weight = weights.getOrDefault(strategy, 1.0);
+            if (weight <= 0) continue;
+
+            int cap = (int) Math.max(10, topK * weight / maxWeight);
+            int limit = Math.min(list.size(), cap);
+
+            for (int rank = 0; rank < limit; rank++) {
                 RecallItem item = list.get(rank);
-                double weight = weights.getOrDefault(item.recallType(), 1.0);
-                if (weight <= 0) {
-                    continue;
-                }
                 scores.merge(item.movieId(), weight / (rrfK + rank + 1.0), Double::sum);
                 recallTypes.putIfAbsent(item.movieId(), item.recallType());
             }

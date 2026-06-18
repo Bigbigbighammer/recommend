@@ -34,7 +34,7 @@ public class YouTubeDNNRecallStrategy implements RecallStrategy {
         return rpcClient.generateUserVector(request)
             .map(resp -> {
                 Set<Long> seen = new HashSet<>(histMovieIds);
-                return embeddingStore.topK(resp.userVector(), topK, seen, getName());
+                return embeddingStore.topKYouTubeDNN(resp.userVector(), topK, seen, getName());
             })
             .onErrorResume(e -> Mono.just(List.of()));
     }
