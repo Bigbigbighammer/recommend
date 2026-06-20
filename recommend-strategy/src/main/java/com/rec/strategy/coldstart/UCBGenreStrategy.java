@@ -42,18 +42,18 @@ public class UCBGenreStrategy implements ColdStartStrategy {
         Long userId = (Long) userFeatures.get("userId");
         if (userId == null) {
             return esRepo.searchByGenres(List.of(), topK)
-                    .map(r -> new RecallItem(r.movieId(), 1.0, getName()))
+                    .map(r -> new RecallItem(r.movieId(), 0.5, getName()))
                     .collectList();
         }
         return redisRepo.getUCBStats(userId)
                 .flatMap(stats -> {
                     String bestGenre = selectBestGenre(stats);
                     return esRepo.searchByGenres(List.of(bestGenre), topK)
-                            .map(r -> new RecallItem(r.movieId(), 1.0, getName()))
+                            .map(r -> new RecallItem(r.movieId(), 0.5, getName()))
                             .collectList();
                 })
                 .switchIfEmpty(esRepo.searchByGenres(List.of(), topK)
-                        .map(r -> new RecallItem(r.movieId(), 1.0, getName()))
+                        .map(r -> new RecallItem(r.movieId(), 0.5, getName()))
                         .collectList());
     }
 

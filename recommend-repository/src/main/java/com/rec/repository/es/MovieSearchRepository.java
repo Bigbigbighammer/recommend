@@ -1,5 +1,6 @@
 package com.rec.repository.es;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.query.Criteria;
@@ -36,8 +37,9 @@ public class MovieSearchRepository {
     public Flux<MovieSearchResult> searchByKeyword(String keyword, int from, int size) {
         Criteria criteria = new Criteria("title").matches(keyword)
             .or(new Criteria("description").matches(keyword));
-        CriteriaQuery query = new CriteriaQuery(criteria);
-        query.setMaxResults(size);
+        int safeSize = Math.max(1, size);
+        CriteriaQuery query = new CriteriaQuery(criteria,
+            PageRequest.of(Math.max(0, from) / safeSize, safeSize));
         return es.search(query, MovieSearchResult.class)
             .map(SearchHit::getContent);
     }

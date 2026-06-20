@@ -171,7 +171,9 @@ async function loadAllMovies() {
 function goPage(p) {
   params.page = p
   syncURL()
-  query.value ? fetchSearch() : loadMovies()
+  if (query.value) return fetchSearch()
+  if (params.genre) return loadMovies()
+  loadAllMovies()
 }
 
 let searchTimeout = null
@@ -179,7 +181,8 @@ async function fetchSearch() {
   searched.value = true
   loading.value = true
   try {
-    const data = await api.search(query.value.trim())
+    const from = (params.page - 1) * params.size
+    const data = await api.search(query.value.trim(), from, params.size)
     movies.value = Array.isArray(data) ? data : (data.items || [])
     total.value = movies.value.length
   } catch { movies.value = []; total.value = 0 }

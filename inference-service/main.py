@@ -22,25 +22,27 @@ RANKING_MODEL_PATH = MODEL_WEIGHTS_DIR / "deepfm_model.pt"
 RANKING_ENCODERS_PATH = MODEL_WEIGHTS_DIR / "ranking_encoders.pkl"
 RANKING_FEATURE_DIMS_PATH = MODEL_WEIGHTS_DIR / "ranking_feature_dims.pkl"
 
-# ── Lazy-loaded ranking predictor ──────────────────────────────────────
+# ── Eager-loaded ranking predictor ─────────────────────────────────────
 _ranking_predictor = None
 
 
-def get_ranking_predictor():
-    """Load DeepFM model on first use (lazy loading)."""
+def _init_ranking_predictor():
+    """Load DeepFM model eagerly at startup so first request doesn't time out."""
     global _ranking_predictor
-    if _ranking_predictor is None:
-        if RANKING_MODEL_PATH.exists():
-            from model_ranking import RankingPredictor
-            logger.info(f"Loading DeepFM ranking model from {RANKING_MODEL_PATH}")
-            _ranking_predictor = RankingPredictor(
-                model_path=str(RANKING_MODEL_PATH),
-                encoders_path=str(RANKING_ENCODERS_PATH),
-                feature_dims_path=str(RANKING_FEATURE_DIMS_PATH),
-            )
-            logger.info("DeepFM ranking model loaded")
-        else:
-            logger.warning(f"Ranking model not found at {RANKING_MODEL_PATH}, using fallback")
+    if RANKING_MODEL_PATH.exists():
+        from model_ranking import RankingPredictor
+        logger.info(f"Loading DeepFM ranking model from {RANKING_MODEL_PATH}")
+        _ranking_predictor = RankingPredictor(
+            model_path=str(RANKING_MODEL_PATH),
+            encoders_path=str(RANKING_ENCODERS_PATH),
+            feature_dims_path=str(RANKING_FEATURE_DIMS_PATH),
+        )
+        logger.info("DeepFM ranking model loaded")
+    else:
+        logger.warning(f"Ranking model not found at {RANKING_MODEL_PATH}, using fallback")
+
+
+def get_ranking_predictor():
     return _ranking_predictor
 
 
@@ -200,6 +202,9 @@ def deterministic_fallback_vector(hist_movie_ids: list[int], dim: int) -> list[f
 
 
 youtube_model = YouTubeDNNModel()
+
+# Eager-load ranking model so first request doesn't trigger lazy load + timeout
+_init_ranking_predictor()
 
 
 # ===== Endpoints =====

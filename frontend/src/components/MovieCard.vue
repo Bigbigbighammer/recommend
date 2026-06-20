@@ -1,7 +1,7 @@
 <template>
   <router-link :to="`/movie/${movie.movieId || movie.movie_id}`" class="card">
     <div class="poster">
-      <img v-if="poster" :src="poster" :alt="movie.title" class="poster-img" loading="lazy" @error="onError" />
+      <img v-if="poster" :src="poster" :alt="movie.title" class="poster-img" @error="onError" />
       <div v-else class="poster-placeholder">
         <span class="poster-year">{{ movie.year || '' }}</span>
         <span class="poster-icon">&#127916;</span>
@@ -17,7 +17,7 @@
           {{ movie.genres.slice(0, 2).join(', ') }}
         </span>
       </div>
-      <span v-if="movie.score" class="score">{{ (movie.score * 100).toFixed(0) }}% match</span>
+
     </div>
   </router-link>
 </template>

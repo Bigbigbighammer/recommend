@@ -37,7 +37,7 @@ public class PopularRecentStrategy implements ColdStartStrategy {
     @Override
     public Mono<List<RecallItem>> recommend(Map<String, Object> userFeatures, int topK) {
         return esRepo.searchByGenres(List.of(), topK)
-                .map(r -> new RecallItem(r.movieId(), 1.0, getName()))
+                .map(r -> new RecallItem(r.movieId(), 0.5, getName()))
                 .collectList();
     }
 }

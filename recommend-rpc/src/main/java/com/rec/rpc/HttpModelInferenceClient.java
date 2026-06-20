@@ -24,10 +24,14 @@ public class HttpModelInferenceClient implements ModelInferenceClient {
 
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
+    private final Duration timeout;
 
-    public HttpModelInferenceClient(@Value("${recommend.rpc.inference.base-url}") String baseUrl) {
+    public HttpModelInferenceClient(
+            @Value("${recommend.rpc.inference.base-url}") String baseUrl,
+            @Value("${recommend.rpc.inference.read-timeout:5000}") long timeoutMs) {
         this.objectMapper = new ObjectMapper()
             .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+        this.timeout = Duration.ofMillis(timeoutMs);
         this.webClient = WebClient.builder()
             .baseUrl(baseUrl)
             .build();
@@ -75,7 +79,7 @@ public class HttpModelInferenceClient implements ModelInferenceClient {
                 r -> r.bodyToMono(String.class)
                     .flatMap(msg -> Mono.error(new InferenceException("Model service error: " + msg))))
             .bodyToMono(String.class)
-            .timeout(Duration.ofMillis(2000));
+            .timeout(timeout);
     }
 
     @Override

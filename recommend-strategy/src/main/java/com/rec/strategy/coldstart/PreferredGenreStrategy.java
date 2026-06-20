@@ -39,7 +39,7 @@ public class PreferredGenreStrategy implements ColdStartStrategy {
     public Mono<List<RecallItem>> recommend(Map<String, Object> userFeatures, int topK) {
         List<String> genres = (List<String>) userFeatures.getOrDefault("preferredGenres", List.of());
         return esRepo.searchByGenres(genres, topK)
-                .map(r -> new RecallItem(r.movieId(), 1.0, getName()))
+                .map(r -> new RecallItem(r.movieId(), 0.5, getName()))
                 .collectList();
     }
 }

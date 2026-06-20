@@ -49,6 +49,7 @@
 </template>
 
 <script setup>
+defineOptions({ name: 'HomeView' })
 import { ref, onMounted } from 'vue'
 import { api } from '../api/index.js'
 import MovieCard from '../components/MovieCard.vue'
